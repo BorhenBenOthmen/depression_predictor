@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mental Health Classification - Prédiction</title>
+    <title>Mental Health Classification - Prédiction du Risque de Suicide</title>
     <style>
         * {
             margin: 0;
@@ -96,6 +96,7 @@
             display: flex;
             justify-content: center;
             margin-top: 30px;
+            gap: 10px;
         }
 
         .btn-predict {
@@ -119,6 +120,23 @@
         .btn-predict:disabled {
             opacity: 0.6;
             cursor: not-allowed;
+        }
+
+        .btn-reset {
+            background: #95a5a6;
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 50px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-reset:hover {
+            background: #7f8c8d;
+            transform: translateY(-2px);
         }
 
         .result-container {
@@ -148,13 +166,44 @@
         .prediction-result {
             text-align: center;
             margin-bottom: 30px;
+            padding: 20px;
+            border-radius: 10px;
+            color: white;
         }
 
-        .prediction-type {
-            font-size: 2em;
-            color: #667eea;
+        .prediction-result.risk-0 {
+            background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+        }
+
+        .prediction-result.risk-1 {
+            background: linear-gradient(135deg, #f39c12 0%, #f1c40f 100%);
+        }
+
+        .prediction-result.risk-2 {
+            background: linear-gradient(135deg, #e67e22 0%, #e74c3c 100%);
+        }
+
+        .prediction-result.risk-3 {
+            background: linear-gradient(135deg, #c0392b 0%, #e74c3c 100%);
+        }
+
+        .risk-label {
+            font-size: 1.8em;
             font-weight: bold;
             margin: 10px 0;
+        }
+
+        .risk-description {
+            font-size: 1.1em;
+            opacity: 0.9;
+            margin: 10px 0;
+        }
+
+        .risk-urgency {
+            font-size: 1.2em;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 2px solid rgba(255,255,255,0.3);
         }
 
         .probabilities {
@@ -164,12 +213,13 @@
         .probability-item {
             display: flex;
             align-items: center;
-            margin: 10px 0;
+            margin: 15px 0;
         }
 
         .probability-label {
             flex: 0 0 200px;
             font-weight: 600;
+            color: #333;
         }
 
         .probability-bar {
@@ -191,6 +241,7 @@
             padding-right: 10px;
             color: white;
             font-weight: bold;
+            font-size: 0.9em;
         }
 
         .recommendations {
@@ -200,24 +251,33 @@
         .recommendations h3 {
             color: #667eea;
             margin-bottom: 15px;
+            font-size: 1.2em;
         }
 
         .recommendation-item {
-            padding: 12px;
+            padding: 15px;
             background: white;
-            border-left: 4px solid #667eea;
+            border-left: 5px solid #667eea;
             margin: 10px 0;
             border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            line-height: 1.6;
         }
 
-        .urgent {
+        .recommendation-item.urgent {
             border-left-color: #e74c3c;
             background: #ffe6e6;
+            font-weight: 600;
         }
 
-        .warning {
+        .recommendation-item.warning {
             border-left-color: #f39c12;
             background: #fff8e6;
+        }
+
+        .recommendation-item.info {
+            border-left-color: #3498db;
+            background: #e8f4f8;
         }
 
         .loading {
@@ -249,8 +309,23 @@
         }
 
         .info-box p {
-            margin: 5px 0;
+            margin: 8px 0;
             color: #2c3e50;
+            line-height: 1.6;
+        }
+
+        .critical-warning {
+            background: #ffe6e6;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #e74c3c;
+        }
+
+        .critical-warning p {
+            color: #c0392b;
+            font-weight: 600;
+            margin: 5px 0;
         }
 
         @media (max-width: 768px) {
@@ -265,6 +340,14 @@
             .content {
                 padding: 20px;
             }
+
+            .btn-container {
+                flex-direction: column;
+            }
+
+            .btn-predict, .btn-reset {
+                width: 100%;
+            }
         }
     </style>
 </head>
@@ -272,13 +355,26 @@
     <div class="container">
         <div class="header">
             <h1>🧠 Mental Health Classification</h1>
-            <p>Système de prédiction du type de dépression</p>
+            <p>🚨 Système de Prédiction du Risque de Suicide</p>
         </div>
 
         <div class="content">
+            <!-- AVERTISSEMENT CRITIQUE -->
+            <div class="critical-warning">
+                <p>🚨 AVERTISSEMENT IMPORTANT:</p>
+                <p>Cet outil évalue le risque basé sur l'IA, ce n'est PAS un diagnostic médical.</p>
+                <p>Si vous ou quelqu'un d'autre êtes en détresse immédiate:</p>
+                <p style="margin-top: 10px; font-size: 1.2em;">📞 France: 3114 (24h/24, 7j/7) | SAMU: 15 | Pompiers: 18</p>
+            </div>
+
+            <!-- INFO BOX -->
             <div class="info-box">
-                <p><strong>ℹ️ Information:</strong> Cet outil utilise l'intelligence artificielle pour évaluer le type de dépression basé sur vos réponses.</p>
-                <p><strong>⚠️ Avertissement:</strong> Ceci n'est pas un diagnostic médical. Consultez toujours un professionnel de santé.</p>
+                <p><strong>ℹ️ Utilisation:</strong> Remplissez le formulaire ci-dessous pour obtenir une évaluation du risque de suicide basée sur vos réponses.</p>
+                <p><strong>📊 Niveaux de risque:</strong></p>
+                <p style="margin-left: 20px;">
+                    🟢 Faible (0) | 🟡 Modéré (1) | 🟠 Élevé (2) | 🔴 Critique (3)
+                </p>
+                <p><strong>⚠️ Données:</strong> Vos données ne sont pas sauvegardées.</p>
             </div>
 
             <form id="predictionForm">
@@ -290,24 +386,25 @@
                             <label for="Gender">Genre *</label>
                             <select id="Gender" name="Gender" required>
                                 <option value="">Sélectionnez...</option>
-                                {% for option in config.Gender %}
-                                <option value="{{ option }}">{{ option }}</option>
-                                {% endfor %}
+                                <option value="0">Homme</option>
+                                <option value="1">Femme</option>
                             </select>
                         </div>
 
                         <div class="form-group">
                             <label for="Age">Âge *</label>
-                            <input type="number" id="Age" name="Age" min="0" max="120" required>
+                            <input type="number" id="Age" name="Age" min="10" max="120" value="25" required>
                         </div>
 
                         <div class="form-group">
                             <label for="Education_Level">Niveau d'éducation *</label>
                             <select id="Education_Level" name="Education_Level" required>
                                 <option value="">Sélectionnez...</option>
-                                {% for option in config.Education_Level %}
-                                <option value="{{ option }}">{{ option }}</option>
-                                {% endfor %}
+                                <option value="0">Lycée</option>
+                                <option value="1">Licence</option>
+                                <option value="2">Master</option>
+                                <option value="3">Doctorat</option>
+                                <option value="4">Aucun</option>
                             </select>
                         </div>
 
@@ -315,9 +412,10 @@
                             <label for="Employment_Status">Statut d'emploi *</label>
                             <select id="Employment_Status" name="Employment_Status" required>
                                 <option value="">Sélectionnez...</option>
-                                {% for option in config.Employment_Status %}
-                                <option value="{{ option }}">{{ option }}</option>
-                                {% endfor %}
+                                <option value="0">Employé</option>
+                                <option value="1">Chômeur</option>
+                                <option value="2">Étudiant</option>
+                                <option value="3">Indépendant</option>
                             </select>
                         </div>
                     </div>
@@ -328,32 +426,45 @@
                     <h2 class="section-title">🩺 Symptômes et État Mental</h2>
                     <div class="form-grid">
                         <div class="form-group">
-                            <label for="Symptoms">Symptômes principaux *</label>
-                            <select id="Symptoms" name="Symptoms" required>
+                            <label for="Depression_Type">Type de dépression *</label>
+                            <select id="Depression_Type" name="Depression_Type" required>
                                 <option value="">Sélectionnez...</option>
-                                {% for option in config.Symptoms %}
-                                <option value="{{ option }}">{{ option }}</option>
-                                {% endfor %}
+                                <option value="0">Type 0</option>
+                                <option value="1">Type 1</option>
+                                <option value="2">Type 2</option>
+                                <option value="3">Type 3</option>
+                                <option value="4">Type 4</option>
+                                <option value="5">Type 5</option>
+                                <option value="6">Type 6</option>
+                                <option value="7">Type 7</option>
+                                <option value="8">Type 8</option>
+                                <option value="9">Type 9</option>
+                                <option value="10">Type 10</option>
+                                <option value="11">Type 11</option>
                             </select>
                         </div>
 
                         <div class="form-group">
-                            <label for="Depression_Score">Score de dépression (0-10) *</label>
-                            <input type="number" id="Depression_Score" name="Depression_Score" min="0" max="10" step="0.1" required>
+                            <label for="Symptoms">Nombre de symptômes (0-14) *</label>
+                            <input type="number" id="Symptoms" name="Symptoms" min="0" max="14" value="5" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="Depression_Score">Score de dépression (0-30) *</label>
+                            <input type="number" id="Depression_Score" name="Depression_Score" min="0" max="30" value="14" required>
                         </div>
 
                         <div class="form-group">
                             <label for="Nervous_Level">Niveau de nervosité (0-10) *</label>
-                            <input type="number" id="Nervous_Level" name="Nervous_Level" min="0" max="10" step="0.1" required>
+                            <input type="number" id="Nervous_Level" name="Nervous_Level" min="0" max="10" value="5" required>
                         </div>
 
                         <div class="form-group">
                             <label for="Low_Energy">Faible énergie *</label>
                             <select id="Low_Energy" name="Low_Energy" required>
                                 <option value="">Sélectionnez...</option>
-                                {% for option in config.Low_Energy %}
-                                <option value="{{ option }}">{{ option }}</option>
-                                {% endfor %}
+                                <option value="0">Non</option>
+                                <option value="1">Oui</option>
                             </select>
                         </div>
 
@@ -361,9 +472,8 @@
                             <label for="Low_SelfEsteem">Faible estime de soi *</label>
                             <select id="Low_SelfEsteem" name="Low_SelfEsteem" required>
                                 <option value="">Sélectionnez...</option>
-                                {% for option in config.Low_SelfEsteem %}
-                                <option value="{{ option }}">{{ option }}</option>
-                                {% endfor %}
+                                <option value="0">Non</option>
+                                <option value="1">Oui</option>
                             </select>
                         </div>
                     </div>
@@ -374,22 +484,27 @@
                     <h2 class="section-title">🍽️ Comportements Alimentaires</h2>
                     <div class="form-grid">
                         <div class="form-group">
-                            <label for="Your_overeating_level">Niveau de suralimentation (0-10) *</label>
-                            <input type="number" id="Your_overeating_level" name="Your_overeating_level" min="0" max="10" step="0.1" required>
+                            <label for="Your_overeating_level">Niveau de suralimentation (0-14) *</label>
+                            <input type="number" id="Your_overeating_level" name="Your_overeating_level" min="0" max="14" value="0" required>
                         </div>
 
                         <div class="form-group">
-                            <label for="How_many_times_you_eat">Nombre de repas par jour *</label>
-                            <input type="number" id="How_many_times_you_eat" name="How_many_times_you_eat" min="0" max="10" required>
+                            <label for="How_many_times_you_eat">Nombre de repas par jour (0-1) *</label>
+                            <select id="How_many_times_you_eat" name="How_many_times_you_eat" required>
+                                <option value="">Sélectionnez...</option>
+                                <option value="0">Pas de repas régulier</option>
+                                <option value="1">Repas réguliers</option>
+                            </select>
                         </div>
 
                         <div class="form-group">
                             <label for="SocialMedia_WhileEating">Réseaux sociaux en mangeant *</label>
                             <select id="SocialMedia_WhileEating" name="SocialMedia_WhileEating" required>
                                 <option value="">Sélectionnez...</option>
-                                {% for option in config.SocialMedia_WhileEating %}
-                                <option value="{{ option }}">{{ option }}</option>
-                                {% endfor %}
+                                <option value="0">Non</option>
+                                <option value="1">Oui</option>
+                                <option value="2">Parfois</option>
+                                <option value="3">Souvent</option>
                             </select>
                         </div>
                     </div>
@@ -400,22 +515,21 @@
                     <h2 class="section-title">💤 Mode de Vie et Habitudes</h2>
                     <div class="form-grid">
                         <div class="form-group">
-                            <label for="Sleep_Hours">Heures de sommeil par nuit *</label>
-                            <input type="number" id="Sleep_Hours" name="Sleep_Hours" min="0" max="24" step="0.5" required>
+                            <label for="Sleep_Hours">Heures de sommeil par nuit (0-10) *</label>
+                            <input type="number" id="Sleep_Hours" name="Sleep_Hours" min="0" max="10" value="7" step="0.5" required>
                         </div>
 
                         <div class="form-group">
-                            <label for="SocialMedia_Hours">Heures sur réseaux sociaux/jour *</label>
-                            <input type="number" id="SocialMedia_Hours" name="SocialMedia_Hours" min="0" max="24" step="0.5" required>
+                            <label for="SocialMedia_Hours">Heures sur réseaux sociaux/jour (0-12) *</label>
+                            <input type="number" id="SocialMedia_Hours" name="SocialMedia_Hours" min="0" max="12" value="5" required>
                         </div>
 
                         <div class="form-group">
                             <label for="Search_Depression_Online">Recherche sur la dépression en ligne *</label>
                             <select id="Search_Depression_Online" name="Search_Depression_Online" required>
                                 <option value="">Sélectionnez...</option>
-                                {% for option in config.Search_Depression_Online %}
-                                <option value="{{ option }}">{{ option }}</option>
-                                {% endfor %}
+                                <option value="0">Non</option>
+                                <option value="1">Oui</option>
                             </select>
                         </div>
 
@@ -423,9 +537,8 @@
                             <label for="Worsening_Depression">Aggravation de la dépression *</label>
                             <select id="Worsening_Depression" name="Worsening_Depression" required>
                                 <option value="">Sélectionnez...</option>
-                                {% for option in config.Worsening_Depression %}
-                                <option value="{{ option }}">{{ option }}</option>
-                                {% endfor %}
+                                <option value="0">Non</option>
+                                <option value="1">Oui</option>
                             </select>
                         </div>
                     </div>
@@ -439,19 +552,20 @@
                             <label for="Coping_Methods">Méthodes d'adaptation *</label>
                             <select id="Coping_Methods" name="Coping_Methods" required>
                                 <option value="">Sélectionnez...</option>
-                                {% for option in config.Coping_Methods %}
-                                <option value="{{ option }}">{{ option }}</option>
-                                {% endfor %}
+                                <option value="0">Exercice</option>
+                                <option value="1">Thérapie</option>
+                                <option value="2">Médicament</option>
+                                <option value="3">Soutien social</option>
+                                <option value="4">Aucune</option>
                             </select>
                         </div>
 
                         <div class="form-group">
-                            <label for="Mental_Health_Support">Support en santé mentale *</label>
+                            <label for="Mental_Health_Support">Support professionnel *</label>
                             <select id="Mental_Health_Support" name="Mental_Health_Support" required>
                                 <option value="">Sélectionnez...</option>
-                                {% for option in config.Mental_Health_Support %}
-                                <option value="{{ option }}">{{ option }}</option>
-                                {% endfor %}
+                                <option value="0">Non</option>
+                                <option value="1">Oui</option>
                             </select>
                         </div>
 
@@ -459,19 +573,8 @@
                             <label for="Self_Harm">Auto-mutilation *</label>
                             <select id="Self_Harm" name="Self_Harm" required>
                                 <option value="">Sélectionnez...</option>
-                                {% for option in config.Self_Harm %}
-                                <option value="{{ option }}">{{ option }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="Suicide_Attempts">Tentatives de suicide *</label>
-                            <select id="Suicide_Attempts" name="Suicide_Attempts" required>
-                                <option value="">Sélectionnez...</option>
-                                {% for option in config.Suicide_Attempts %}
-                                <option value="{{ option }}">{{ option }}</option>
-                                {% endfor %}
+                                <option value="0">Non</option>
+                                <option value="1">Oui</option>
                             </select>
                         </div>
                     </div>
@@ -479,7 +582,10 @@
 
                 <div class="btn-container">
                     <button type="submit" class="btn-predict" id="predictBtn">
-                        🔮 Obtenir la Prédiction
+                        🔮 Évaluer le Risque
+                    </button>
+                    <button type="reset" class="btn-reset" id="resetBtn">
+                        🔄 Réinitialiser
                     </button>
                 </div>
             </form>
@@ -490,18 +596,20 @@
             </div>
 
             <div id="resultContainer" class="result-container">
-                <div class="prediction-result">
-                    <h2>Résultat de la Prédiction</h2>
-                    <div class="prediction-type" id="predictionType"></div>
+                <div class="prediction-result" id="predictionResult">
+                    <h2>Évaluation du Risque</h2>
+                    <div class="risk-label" id="riskLabel"></div>
+                    <div class="risk-description" id="riskDescription"></div>
+                    <div class="risk-urgency" id="riskUrgency"></div>
                 </div>
 
                 <div class="probabilities">
-                    <h3>Probabilités par type de dépression:</h3>
+                    <h3>📊 Probabilités par Niveau de Risque:</h3>
                     <div id="probabilitiesContainer"></div>
                 </div>
 
                 <div class="recommendations">
-                    <h3>📌 Recommandations:</h3>
+                    <h3>📌 Recommandations Personnalisées:</h3>
                     <div id="recommendationsContainer"></div>
                 </div>
             </div>
@@ -509,6 +617,14 @@
     </div>
 
     <script>
+        // Mapping des niveaux de risque
+        const riskLevels = {
+            0: { label: '🟢 Risque Faible', color: 'risk-0', icon: '✓' },
+            1: { label: '🟡 Risque Modéré', color: 'risk-1', icon: '⚠️' },
+            2: { label: '🟠 Risque Élevé', color: 'risk-2', icon: '⚠️⚠️' },
+            3: { label: '🔴 Risque CRITIQUE', color: 'risk-3', icon: '🚨' }
+        };
+
         document.getElementById('predictionForm').addEventListener('submit', async function(e) {
             e.preventDefault();
 
@@ -532,18 +648,31 @@
                 const result = await response.json();
 
                 if (result.success) {
-                    // Afficher la prédiction
-                    document.getElementById('predictionType').textContent = result.prediction;
+                    // Déterminer le niveau de risque
+                    const riskLevel = result.risk_level;
+                    const riskInfo = riskLevels[riskLevel];
+
+                    // Mettre à jour le style du résultat
+                    const predictionResult = document.getElementById('predictionResult');
+                    predictionResult.className = `prediction-result ${riskInfo.color}`;
+
+                    // Afficher les informations de risque
+                    document.getElementById('riskLabel').textContent = riskInfo.label;
+                    document.getElementById('riskDescription').textContent = result.risk_description;
+                    document.getElementById('riskUrgency').textContent = result.urgency;
 
                     // Afficher les probabilités
                     const probContainer = document.getElementById('probabilitiesContainer');
                     probContainer.innerHTML = '';
 
-                    for (const [type, prob] of Object.entries(result.probabilities)) {
+                    const riskLabels = ['🟢 Faible (0)', '🟡 Modéré (1)', '🟠 Élevé (2)', '🔴 Critique (3)'];
+
+                    for (let i = 0; i < 4; i++) {
+                        const prob = result.probabilities[`Risk_Level_${i}`] || 0;
                         const percentage = (prob * 100).toFixed(1);
                         probContainer.innerHTML += `
                             <div class="probability-item">
-                                <span class="probability-label">${type}</span>
+                                <span class="probability-label">${riskLabels[i]}</span>
                                 <div class="probability-bar">
                                     <div class="probability-fill" style="width: ${percentage}%">
                                         ${percentage}%
@@ -558,8 +687,10 @@
                     recoContainer.innerHTML = '';
 
                     result.recommendations.forEach(reco => {
-                        const className = reco.includes('🚨') ? 'urgent' :
-                                        reco.includes('⚠️') ? 'warning' : '';
+                        let className = 'info';
+                        if (reco.includes('🚨')) className = 'urgent';
+                        else if (reco.includes('⚠️')) className = 'warning';
+
                         recoContainer.innerHTML += `
                             <div class="recommendation-item ${className}">
                                 ${reco}
@@ -571,9 +702,11 @@
                     document.getElementById('resultContainer').classList.add('show');
 
                     // Scroller vers les résultats
-                    document.getElementById('resultContainer').scrollIntoView({
-                        behavior: 'smooth'
-                    });
+                    setTimeout(() => {
+                        document.getElementById('resultContainer').scrollIntoView({
+                            behavior: 'smooth'
+                        });
+                    }, 300);
                 } else {
                     alert('Erreur: ' + result.error);
                 }
@@ -583,6 +716,11 @@
                 document.getElementById('loadingDiv').style.display = 'none';
                 document.getElementById('predictBtn').disabled = false;
             }
+        });
+
+        // Bouton reset
+        document.getElementById('resetBtn').addEventListener('click', function() {
+            document.getElementById('resultContainer').classList.remove('show');
         });
     </script>
 </body>

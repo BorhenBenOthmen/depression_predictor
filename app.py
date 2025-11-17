@@ -1,6 +1,7 @@
 """
 Mental Health Classification - Application Flask
-Application web pour prédire le type de dépression basé sur les caractéristiques de l'utilisateur
+Application web pour prédire le risque de suicide basé sur les caractéristiques de l'utilisateur
+VERSION MODIFIÉE: Prédiction de Suicide_Attempts
 """
 
 from flask import Flask, render_template, request, jsonify
@@ -24,32 +25,45 @@ try:
     with open(ENCODERS_PATH, 'rb') as f:
         label_encoders = pickle.load(f)
     print("✓ Modèle, scaler et encoders chargés avec succès!")
+    print(f"✓ Modèle type: {type(model).__name__}")
 except Exception as e:
     print(f"❌ Erreur lors du chargement des modèles: {e}")
     print("Veuillez d'abord exécuter model_training.py")
 
-# Configuration des features et leurs options
-FEATURE_CONFIG = {
-    'Gender': ['Male', 'Female', 'Other'],
-    'Education_Level': ['High School', 'Bachelor', 'Master', 'PhD', 'None'],
-    'Employment_Status': ['Employed', 'Unemployed', 'Student', 'Self-employed'],
-    'Symptoms': ['Anxiety', 'Fatigue', 'Sadness', 'Insomnia', 'Loss of interest'],
-    'Low_Energy': ['Yes', 'No'],
-    'Low_SelfEsteem': ['Yes', 'No'],
-    'Search_Depression_Online': ['Yes', 'No'],
-    'Worsening_Depression': ['Yes', 'No'],
-    'SocialMedia_WhileEating': ['Yes', 'No'],
-    'Coping_Methods': ['Exercise', 'Therapy', 'Medication', 'Social support', 'None'],
-    'Self_Harm': ['Yes', 'No'],
-    'Mental_Health_Support': ['Yes', 'No'],
-    'Suicide_Attempts': ['Yes', 'No']
+
+# Mappage des niveaux de risque
+RISK_LEVELS = {
+    0: {
+        'label': 'Risque Faible',
+        'color': 'green',
+        'description': 'Pas de tentatives de suicide signalées',
+        'urgency': 'Normal'
+    },
+    1: {
+        'label': 'Risque Modéré',
+        'color': 'yellow',
+        'description': 'Une tentative de suicide signalée',
+        'urgency': 'À surveiller'
+    },
+    2: {
+        'label': 'Risque Élevé',
+        'color': 'orange',
+        'description': 'Deux tentatives de suicide signalées',
+        'urgency': 'Consultation recommandée'
+    },
+    3: {
+        'label': 'Risque Critique',
+        'color': 'red',
+        'description': 'Trois tentatives de suicide signalées',
+        'urgency': '🚨 URGENT - Contactez une ligne de crise'
+    }
 }
 
 
 @app.route('/')
 def home():
     """Page d'accueil avec le formulaire de prédiction"""
-    return render_template('index.html', config=FEATURE_CONFIG)
+    return render_template('index.html')
 
 
 @app.route('/predict', methods=['POST'])
@@ -59,46 +73,44 @@ def predict():
         # Récupérer les données du formulaire
         data = request.get_json()
 
-        # Préparer les features dans le bon ordre
+        # Préparer les features (SANS Suicide_Attempts qui est la TARGET)
         features_dict = {
-            'Gender': data.get('Gender'),
-            'Age': float(data.get('Age', 0)),
-            'Education_Level': data.get('Education_Level'),
-            'Employment_Status': data.get('Employment_Status'),
-            'Symptoms': data.get('Symptoms'),
-            'Low_Energy': data.get('Low_Energy'),
-            'Low_SelfEsteem': data.get('Low_SelfEsteem'),
-            'Search_Depression_Online': data.get('Search_Depression_Online'),
-            'Worsening_Depression': data.get('Worsening_Depression'),
-            'Your overeating level': float(data.get('Your_overeating_level', 0)),
-            'How many times you eat': float(data.get('How_many_times_you_eat', 0)),
-            'SocialMedia_Hours': float(data.get('SocialMedia_Hours', 0)),
-            'SocialMedia_WhileEating': data.get('SocialMedia_WhileEating'),
-            'Sleep_Hours': float(data.get('Sleep_Hours', 0)),
-            'Nervous_Level': float(data.get('Nervous_Level', 0)),
-            'Depression_Score': float(data.get('Depression_Score', 0)),
-            'Coping_Methods': data.get('Coping_Methods'),
-            'Self_Harm': data.get('Self_Harm'),
-            'Mental_Health_Support': data.get('Mental_Health_Support'),
-            'Suicide_Attempts': data.get('Suicide_Attempts')
+            'Gender': int(data.get('Gender', 0)),
+            'Age': int(data.get('Age', 25)),
+            'Education_Level': int(data.get('Education_Level', 0)),
+            'Employment_Status': int(data.get('Employment_Status', 0)),
+            'Depression_Type': int(data.get('Depression_Type', 0)),
+            'Symptoms': int(data.get('Symptoms', 0)),
+            'Low_Energy': int(data.get('Low_Energy', 0)),
+            'Low_SelfEsteem': int(data.get('Low_SelfEsteem', 0)),
+            'Search_Depression_Online': int(data.get('Search_Depression_Online', 0)),
+            'Worsening_Depression': int(data.get('Worsening_Depression', 0)),
+            'Your overeating level': int(data.get('Your_overeating_level', 0)),
+            'How many times you eat': int(data.get('How_many_times_you_eat', 0)),
+            'SocialMedia_Hours': int(data.get('SocialMedia_Hours', 0)),
+            'SocialMedia_WhileEating': int(data.get('SocialMedia_WhileEating', 0)),
+            'Sleep_Hours': int(data.get('Sleep_Hours', 6)),
+            'Nervous_Level': int(data.get('Nervous_Level', 0)),
+            'Depression_Score': int(data.get('Depression_Score', 0)),
+            'Coping_Methods': int(data.get('Coping_Methods', 0)),
+            'Self_Harm': int(data.get('Self_Harm', 0)),
+            'Mental_Health_Support': int(data.get('Mental_Health_Support', 0))
         }
 
-        # Créer un DataFrame
+        # Créer un DataFrame avec les colonnes dans le bon ordre
         input_df = pd.DataFrame([features_dict])
 
-        # Encoder les variables catégorielles
-        categorical_columns = ['Gender', 'Education_Level', 'Employment_Status', 'Symptoms',
-                               'Low_Energy', 'Low_SelfEsteem', 'Search_Depression_Online',
-                               'Worsening_Depression', 'SocialMedia_WhileEating', 'Coping_Methods',
-                               'Self_Harm', 'Mental_Health_Support', 'Suicide_Attempts']
+        # Vérifier que toutes les colonnes correspondent à l'entraînement
+        expected_columns = [
+            'Gender', 'Age', 'Education_Level', 'Employment_Status', 'Depression_Type',
+            'Symptoms', 'Low_Energy', 'Low_SelfEsteem', 'Search_Depression_Online',
+            'Worsening_Depression', 'Your overeating level', 'How many times you eat',
+            'SocialMedia_Hours', 'SocialMedia_WhileEating', 'Sleep_Hours', 'Nervous_Level',
+            'Depression_Score', 'Coping_Methods', 'Self_Harm', 'Mental_Health_Support'
+        ]
 
-        for col in categorical_columns:
-            if col in label_encoders and col in input_df.columns:
-                try:
-                    input_df[col] = label_encoders[col].transform(input_df[col])
-                except ValueError:
-                    # Si la valeur n'est pas dans les classes connues, utiliser la première classe
-                    input_df[col] = 0
+        # Réordonner les colonnes
+        input_df = input_df[expected_columns]
 
         # Normaliser
         input_scaled = scaler.transform(input_df)
@@ -107,88 +119,103 @@ def predict():
         prediction = model.predict(input_scaled)
         prediction_proba = model.predict_proba(input_scaled)
 
-        # Décoder la prédiction
-        depression_type = label_encoders['Depression_Type'].inverse_transform(prediction)[0]
+        # Niveau de risque prédit (0, 1, 2, ou 3)
+        suicide_risk_level = int(prediction[0])
 
         # Obtenir les probabilités pour chaque classe
-        classes = label_encoders['Depression_Type'].classes_
-        probabilities = {classes[i]: float(prediction_proba[0][i]) for i in range(len(classes))}
+        risk_probabilities = {
+            f'Risk_Level_{i}': float(prediction_proba[0][i])
+            for i in range(len(prediction_proba[0]))
+        }
 
-        # Recommandations basées sur le type de dépression
-        recommendations = get_recommendations(depression_type, features_dict)
+        # Informations sur le risque
+        risk_info = RISK_LEVELS.get(suicide_risk_level, RISK_LEVELS[0])
+
+        # Générer les recommandations
+        recommendations = get_recommendations(suicide_risk_level, features_dict)
 
         return jsonify({
             'success': True,
-            'prediction': depression_type,
-            'probabilities': probabilities,
+            'risk_level': suicide_risk_level,
+            'risk_label': risk_info['label'],
+            'risk_color': risk_info['color'],
+            'risk_description': risk_info['description'],
+            'urgency': risk_info['urgency'],
+            'probabilities': risk_probabilities,
             'recommendations': recommendations
         })
 
     except Exception as e:
+        print(f"Erreur: {str(e)}")
         return jsonify({
             'success': False,
-            'error': str(e)
+            'error': f'Erreur lors de la prédiction: {str(e)}'
         }), 400
 
 
-def get_recommendations(depression_type, features):
-    """Générer des recommandations basées sur le type de dépression et les features"""
+def get_recommendations(risk_level, features):
+    """Générer des recommandations basées sur le niveau de risque et les features"""
     recommendations = []
 
-    # Recommandations générales
-    base_recommendations = {
-        'Major Depression': [
-            "Consultez un professionnel de santé mentale dès que possible",
-            "Envisagez une thérapie cognitivo-comportementale (TCC)",
-            "Parlez à votre médecin des options de traitement médicamenteux",
-            "Établissez une routine quotidienne stable"
+    # Recommandations basées sur le niveau de risque
+    risk_recommendations = {
+        0: [
+            "✓ Continuez à surveiller votre santé mentale",
+            "✓ Maintenez vos habitudes de bien-être",
+            "✓ Restez en contact avec votre réseau social",
+            "✓ Consultez un professionnel une fois par an"
         ],
-        'Persistent Depressive Disorder': [
-            "Maintenez un suivi régulier avec un thérapeute",
-            "Développez des stratégies d'adaptation à long terme",
-            "Pratiquez la pleine conscience et la méditation",
-            "Rejoignez un groupe de soutien"
+        1: [
+            "⚠️ Consultez un professionnel de santé mentale dès que possible",
+            "⚠️ Envisagez une thérapie cognitivo-comportementale (TCC)",
+            "⚠️ Parlez à votre médecin des options de traitement",
+            "⚠️ Établissez une routine quotidienne stable"
         ],
-        'Bipolar Disorder': [
-            "Consultez un psychiatre spécialisé dans les troubles bipolaires",
-            "Maintenez un journal de l'humeur",
-            "Établissez une routine de sommeil régulière",
-            "Évitez l'alcool et les substances"
+        2: [
+            "🔴 Consultation URGENTE avec un psychiatre recommandée",
+            "🔴 Envisagez un traitement médicamenteux",
+            "🔴 Réduisez votre exposition aux facteurs de stress",
+            "🔴 Restez entouré(e) et en contact régulier avec votre réseau",
+            "🔴 Envisagez un groupe de soutien"
         ],
-        'Seasonal Affective Disorder': [
-            "Exposez-vous à la lumière naturelle autant que possible",
-            "Envisagez la luminothérapie",
-            "Maintenez une activité physique régulière",
-            "Planifiez des activités sociales"
-        ],
-        'Postpartum Depression': [
-            "Parlez à votre médecin immédiatement",
-            "Acceptez l'aide de votre entourage",
-            "Rejoignez un groupe de soutien pour jeunes parents",
-            "Ne restez pas seule avec vos émotions"
+        3: [
+            "🚨 URGENT - Contactez immédiatement une ligne de crise",
+            "🚨 France: 3114 (gratuit, 24h/24, 7j/7)",
+            "🚨 Appelez le SAMU (15) ou les pompiers (18) si nécessaire",
+            "🚨 Allez aux urgences si vous avez des pensées suicidaires",
+            "🚨 Prévenez quelqu'un de confiance immédiatement"
         ]
     }
 
-    recommendations.extend(base_recommendations.get(depression_type, [
-        "Consultez un professionnel de santé mentale",
-        "Prenez soin de votre bien-être général"
-    ]))
+    recommendations.extend(risk_recommendations.get(risk_level, []))
 
     # Recommandations spécifiques basées sur les features
-    if features.get('Sleep_Hours', 0) < 6:
-        recommendations.append("⚠️ Améliorez votre hygiène de sommeil (visez 7-9 heures)")
+    if features.get('Sleep_Hours', 6) < 6:
+        recommendations.append("💤 Améliorez votre hygiène de sommeil (visez 7-9 heures)")
+
+    if features.get('Sleep_Hours', 6) > 10:
+        recommendations.append("💤 Un sommeil excessif peut être un signe - Consultez un médecin")
 
     if features.get('SocialMedia_Hours', 0) > 4:
-        recommendations.append("⚠️ Réduisez votre temps sur les réseaux sociaux")
+        recommendations.append("📱 Réduisez votre temps sur les réseaux sociaux (max 2-3 heures/jour)")
 
     if features.get('Nervous_Level', 0) > 7:
-        recommendations.append("⚠️ Pratiquez des techniques de relaxation (respiration, yoga)")
+        recommendations.append("🧘 Pratiquez des techniques de relaxation (respiration, yoga, méditation)")
 
-    if features.get('Mental_Health_Support') == 'No':
-        recommendations.append("⚠️ Cherchez un soutien professionnel en santé mentale")
+    if features.get('Low_Energy', 0) == 1:
+        recommendations.append("⚡ Faible énergie signalée - Pratiquez une activité physique régulière")
 
-    if features.get('Self_Harm') == 'Yes' or features.get('Suicide_Attempts') == 'Yes':
-        recommendations.insert(0, "🚨 URGENT: Contactez immédiatement une ligne de crise (ex: 3114 en France)")
+    if features.get('Low_SelfEsteem', 0) == 1:
+        recommendations.append("💪 Basse estime de soi - Envisagez une thérapie cognitivo-comportementale")
+
+    if features.get('Self_Harm', 0) == 1:
+        recommendations.insert(0, "🚨 AUTO-BLESSURES SIGNALÉES - Appelez une ligne de crise immédiatement!")
+
+    if features.get('Mental_Health_Support', 0) == 0:
+        recommendations.append("🤝 Cherchez un soutien professionnel ou rejoignez un groupe de soutien")
+
+    if features.get('Coping_Methods', 0) == 0:
+        recommendations.append("🎯 Développez des stratégies d'adaptation saines (exercice, hobby, socialisation)")
 
     return recommendations
 
@@ -196,12 +223,33 @@ def get_recommendations(depression_type, features):
 @app.route('/info')
 def info():
     """Page d'information sur l'application"""
-    model_info = {
-        'model_type': type(model).__name__,
-        'features_count': len(scaler.mean_),
-        'depression_types': list(label_encoders['Depression_Type'].classes_)
-    }
+    try:
+        model_info = {
+            'model_type': type(model).__name__,
+            'features_count': len(scaler.mean_),
+            'target': 'Suicide_Attempts',
+            'risk_levels': list(range(4)),
+            'risk_labels': [RISK_LEVELS[i]['label'] for i in range(4)]
+        }
+    except:
+        model_info = {
+            'model_type': 'Modèle non chargé',
+            'features_count': 0,
+            'target': 'Suicide_Attempts',
+            'risk_levels': list(range(4)),
+            'risk_labels': [RISK_LEVELS[i]['label'] for i in range(4)]
+        }
+
     return render_template('info.html', model_info=model_info)
+
+
+@app.route('/health')
+def health():
+    """Endpoint de santé pour vérifier que le serveur est en marche"""
+    return jsonify({
+        'status': 'healthy',
+        'message': 'Application Mental Health Classification en marche'
+    })
 
 
 if __name__ == '__main__':
@@ -210,11 +258,17 @@ if __name__ == '__main__':
         os.makedirs('templates')
         print("✓ Dossier 'templates' créé")
 
+    if not os.path.exists('models'):
+        os.makedirs('models')
+        print("✓ Dossier 'models' créé")
+
     print("\n" + "=" * 60)
     print("🌐 APPLICATION FLASK - MENTAL HEALTH CLASSIFICATION")
     print("=" * 60)
     print("\n✓ Serveur démarré!")
     print("✓ Ouvrez votre navigateur: http://127.0.0.1:5000")
+    print("✓ Variable prédite: Suicide_Attempts")
+    print("✓ Niveaux de risque: 0 (Faible) → 1 (Modéré) → 2 (Élevé) → 3 (Critique)")
     print("\nAppuyez sur Ctrl+C pour arrêter le serveur\n")
 
     app.run(debug=True, host='0.0.0.0', port=5000)
