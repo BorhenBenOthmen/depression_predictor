@@ -4,13 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7ec5e63e-1899-4cb2-99ea-3ee8706692b2" name="Changes" comment="">
+    <list default="true" id="7ec5e63e-1899-4cb2-99ea-3ee8706692b2" name="Changes" comment="sa77a binome">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.virtual_documents/notebooks/exploration.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/.virtual_documents/notebooks/exploration.ipynb" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app.py" beforeDir="false" afterPath="$PROJECT_DIR$/app.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/model_training.py" beforeDir="false" afterPath="$PROJECT_DIR$/model_training.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/notebooks/exploration.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/notebooks/exploration.ipynb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/index.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -29,18 +25,18 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
-  "lastFilter": {
-    "state": "OPEN",
-    "assignee": "BorhenBenOthmen"
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;BorhenBenOthmen&quot;
   }
-}]]></component>
-  <component name="GithubPullRequestsUISettings"><![CDATA[{
-  "selectedUrlAndAccountId": {
-    "url": "https://github.com/BorhenBenOthmen/depression_predictor",
-    "accountId": "4ca1dfdb-882e-4789-b781-fb5875cf4210"
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/BorhenBenOthmen/depression_predictor&quot;,
+    &quot;accountId&quot;: &quot;4ca1dfdb-882e-4789-b781-fb5875cf4210&quot;
   }
-}]]></component>
+}</component>
   <component name="ProjectColorInfo">{
   &quot;customColor&quot;: &quot;&quot;,
   &quot;associatedIndex&quot;: 1
@@ -50,20 +46,20 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "DefaultHtmlFileTemplate": "HTML File",
-    "ModuleVcsDetector.initialDetectionPerformed": "true",
-    "Python.app.executor": "Run",
-    "Python.conv.executor": "Run",
-    "Python.model_training.executor": "Run",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "projet-2",
-    "last_opened_file_path": "C:/Users/borhen/PycharmProjects/projetML/data/ipynb_checkpoints"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;DefaultHtmlFileTemplate&quot;: &quot;HTML File&quot;,
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;Python.app.executor&quot;: &quot;Run&quot;,
+    &quot;Python.conv.executor&quot;: &quot;Run&quot;,
+    &quot;Python.model_training.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;projet-2&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/borhen/PycharmProjects/projetML/data/ipynb_checkpoints&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="C:\Users\borhen\PycharmProjects\projetML\data\ipynb_checkpoints" />
@@ -84,6 +80,19 @@
       <option name="presentableId" value="Default" />
       <updated>1763386656734</updated>
     </task>
+    <task id="LOCAL-00001" summary="sa77a binome">
+      <option name="closed" value="true" />
+      <created>1763412791030</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1763412791030</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="sa77a binome" />
+    <option name="LAST_COMMIT_MESSAGE" value="sa77a binome" />
   </component>
 </project>

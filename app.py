@@ -30,7 +30,6 @@ except Exception as e:
     print(f"❌ Erreur lors du chargement des modèles: {e}")
     print("Veuillez d'abord exécuter model_training.py")
 
-
 # Mappage des niveaux de risque
 RISK_LEVELS = {
     0: {
@@ -74,6 +73,7 @@ def predict():
         data = request.get_json()
 
         # Préparer les features (SANS Suicide_Attempts qui est la TARGET)
+        # IMPORTANT: Créer avec exactement les mêmes noms de colonnes que dans le dataset original
         features_dict = {
             'Gender': int(data.get('Gender', 0)),
             'Age': int(data.get('Age', 25)),
@@ -86,7 +86,7 @@ def predict():
             'Search_Depression_Online': int(data.get('Search_Depression_Online', 0)),
             'Worsening_Depression': int(data.get('Worsening_Depression', 0)),
             'Your overeating level': int(data.get('Your_overeating_level', 0)),
-            'How many times you eat': int(data.get('How_many_times_you_eat', 0)),
+            'How many times you eat ': int(data.get('How_many_times_you_eat', 0)),
             'SocialMedia_Hours': int(data.get('SocialMedia_Hours', 0)),
             'SocialMedia_WhileEating': int(data.get('SocialMedia_WhileEating', 0)),
             'Sleep_Hours': int(data.get('Sleep_Hours', 6)),
@@ -97,20 +97,21 @@ def predict():
             'Mental_Health_Support': int(data.get('Mental_Health_Support', 0))
         }
 
-        # Créer un DataFrame avec les colonnes dans le bon ordre
+        # Créer un DataFrame
         input_df = pd.DataFrame([features_dict])
 
-        # Vérifier que toutes les colonnes correspondent à l'entraînement
-        expected_columns = [
-            'Gender', 'Age', 'Education_Level', 'Employment_Status', 'Depression_Type',
-            'Symptoms', 'Low_Energy', 'Low_SelfEsteem', 'Search_Depression_Online',
-            'Worsening_Depression', 'Your overeating level', 'How many times you eat',
-            'SocialMedia_Hours', 'SocialMedia_WhileEating', 'Sleep_Hours', 'Nervous_Level',
-            'Depression_Score', 'Coping_Methods', 'Self_Harm', 'Mental_Health_Support'
-        ]
+        # Vérifier les colonnes
+        print(f"Colonnes du DataFrame: {list(input_df.columns)}")
+        print(f"Colonnes du scaler: {list(scaler.get_feature_names_out())}")
 
-        # Réordonner les colonnes
-        input_df = input_df[expected_columns]
+        # S'assurer que les colonnes sont dans le bon ordre et correspondent au scaler
+        try:
+            # Utiliser les noms exacts du scaler
+            expected_columns = list(scaler.get_feature_names_out())
+            input_df = input_df[expected_columns]
+        except Exception as e:
+            print(f"Erreur lors du réagencement des colonnes: {e}")
+            raise
 
         # Normaliser
         input_scaled = scaler.transform(input_df)
