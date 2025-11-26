@@ -109,7 +109,7 @@
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s;
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+            box-shadow: 0<Rigidbody 4px 15px rgba(102, 126, 234, 0.4);
         }
 
         .btn-predict:hover {
@@ -166,7 +166,7 @@
         .prediction-result {
             text-align: center;
             margin-bottom: 30px;
-            padding: 20px;
+            padding: 30px;
             border-radius: 10px;
             color: white;
         }
@@ -176,59 +176,63 @@
         }
 
         .prediction-result.risk-1 {
-            background: linear-gradient(135deg, #f39c12 0%, #f1c40f 100%);
-        }
-
-        .prediction-result.risk-2 {
-            background: linear-gradient(135deg, #e67e22 0%, #e74c3c 100%);
-        }
-
-        .prediction-result.risk-3 {
             background: linear-gradient(135deg, #c0392b 0%, #e74c3c 100%);
         }
 
         .risk-label {
-            font-size: 1.8em;
+            font-size: 2.2em;
             font-weight: bold;
-            margin: 10px 0;
+            margin: 20px 0;
         }
 
         .risk-description {
-            font-size: 1.1em;
-            opacity: 0.9;
-            margin: 10px 0;
+            font-size: 1.15em;
+            opacity: 0.95;
+            margin: 15px 0;
+            line-height: 1.6;
         }
 
         .risk-urgency {
-            font-size: 1.2em;
-            margin-top: 15px;
-            padding-top: 15px;
+            font-size: 1.15em;
+            margin-top: 20px;
+            padding-top: 20px;
             border-top: 2px solid rgba(255,255,255,0.3);
+            font-weight: 600;
         }
 
         .probabilities {
-            margin: 20px 0;
+            margin: 30px 0;
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+        }
+
+        .probabilities h3 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 1.3em;
         }
 
         .probability-item {
             display: flex;
             align-items: center;
-            margin: 15px 0;
+            margin: 25px 0;
+            gap: 15px;
         }
 
         .probability-label {
             flex: 0 0 200px;
             font-weight: 600;
             color: #333;
+            font-size: 1.05em;
         }
 
         .probability-bar {
             flex: 1;
-            height: 30px;
+            height: 45px;
             background: #e0e0e0;
-            border-radius: 15px;
+            border-radius: 22px;
             overflow: hidden;
-            margin: 0 10px;
         }
 
         .probability-fill {
@@ -237,28 +241,31 @@
             transition: width 0.5s ease;
             display: flex;
             align-items: center;
-            justify-content: flex-end;
-            padding-right: 10px;
+            justify-content: center;
             color: white;
             font-weight: bold;
-            font-size: 0.9em;
+            font-size: 1em;
+            min-width: 60px;
         }
 
         .recommendations {
             margin-top: 30px;
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
         }
 
         .recommendations h3 {
             color: #667eea;
-            margin-bottom: 15px;
-            font-size: 1.2em;
+            margin-bottom: 20px;
+            font-size: 1.3em;
         }
 
         .recommendation-item {
             padding: 15px;
-            background: white;
+            background: #f8f9fa;
             border-left: 5px solid #667eea;
-            margin: 10px 0;
+            margin: 12px 0;
             border-radius: 5px;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
             line-height: 1.6;
@@ -268,6 +275,7 @@
             border-left-color: #e74c3c;
             background: #ffe6e6;
             font-weight: 600;
+            color: #c0392b;
         }
 
         .recommendation-item.warning {
@@ -348,39 +356,53 @@
             .btn-predict, .btn-reset {
                 width: 100%;
             }
+
+            .probability-item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .probability-label {
+                flex: 1 1 100%;
+            }
+
+            .probability-bar {
+                flex: 1 1 100%;
+                width: 100%;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>🧠 Mental Health Classification</h1>
-            <p>🚨 Système de Prédiction du Risque de Suicide</p>
+            <h1>Mental Health Classification</h1>
+            <p>Système de Prédiction du Risque de Suicide</p>
         </div>
 
         <div class="content">
             <!-- AVERTISSEMENT CRITIQUE -->
             <div class="critical-warning">
-                <p>🚨 AVERTISSEMENT IMPORTANT:</p>
+                <p>AVERTISSEMENT IMPORTANT:</p>
                 <p>Cet outil évalue le risque basé sur l'IA, ce n'est PAS un diagnostic médical.</p>
                 <p>Si vous ou quelqu'un d'autre êtes en détresse immédiate:</p>
-                <p style="margin-top: 10px; font-size: 1.2em;">📞 France: 3114 (24h/24, 7j/7) | SAMU: 15 | Pompiers: 18</p>
+                <p style="margin-top: 10px; font-size: 1.2em;">France: 3114 (24h/24, 7j/7) | SAMU: 15 | Pompiers: 18</p>
             </div>
 
             <!-- INFO BOX -->
             <div class="info-box">
-                <p><strong>ℹ️ Utilisation:</strong> Remplissez le formulaire ci-dessous pour obtenir une évaluation du risque de suicide basée sur vos réponses.</p>
-                <p><strong>📊 Niveaux de risque:</strong></p>
-                <p style="margin-left: 20px;">
-                    🟢 Faible (0) | 🟡 Modéré (1) | 🟠 Élevé (2) | 🔴 Critique (3)
+                <p><strong>Utilisation:</strong> Remplissez le formulaire ci-dessous pour obtenir une évaluation du risque de suicide.</p>
+                <p><strong>Classification:</strong> Le modèle prédit en 2 niveaux: </p>
+                <p style="margin-left: 20px; font-size: 1.05em;">
+                    <strong>Niveau 0</strong> (Pas de risque) | <strong>Niveau 1</strong> (Risque identifié)
                 </p>
-                <p><strong>⚠️ Données:</strong> Vos données ne sont pas sauvegardées.</p>
+                <p><strong>Données:</strong> Vos données ne sont pas sauvegardées.</p>
             </div>
 
             <form id="predictionForm">
                 <!-- Section Informations Démographiques -->
                 <div class="form-section">
-                    <h2 class="section-title">📋 Informations Démographiques</h2>
+                    <h2 class="section-title">Informations Démographiques</h2>
                     <div class="form-grid">
                         <div class="form-group">
                             <label for="Gender">Genre *</label>
@@ -423,7 +445,7 @@
 
                 <!-- Section Symptômes -->
                 <div class="form-section">
-                    <h2 class="section-title">🩺 Symptômes et État Mental</h2>
+                    <h2 class="section-title">Symptômes et État Mental</h2>
                     <div class="form-grid">
                         <div class="form-group">
                             <label for="Depression_Type">Type de dépression *</label>
@@ -481,7 +503,7 @@
 
                 <!-- Section Comportements -->
                 <div class="form-section">
-                    <h2 class="section-title">🍽️ Comportements Alimentaires</h2>
+                    <h2 class="section-title">Comportements Alimentaires</h2>
                     <div class="form-grid">
                         <div class="form-group">
                             <label for="Your_overeating_level">Niveau de suralimentation (0-14) *</label>
@@ -489,7 +511,7 @@
                         </div>
 
                         <div class="form-group">
-                            <label for="How_many_times_you_eat">Nombre de repas par jour (0-1) *</label>
+                            <label for="How_many_times_you_eat">Nombre de repas par jour *</label>
                             <select id="How_many_times_you_eat" name="How_many_times_you_eat" required>
                                 <option value="">Sélectionnez...</option>
                                 <option value="0">Pas de repas régulier</option>
@@ -512,7 +534,7 @@
 
                 <!-- Section Mode de vie -->
                 <div class="form-section">
-                    <h2 class="section-title">💤 Mode de Vie et Habitudes</h2>
+                    <h2 class="section-title">Mode de Vie et Habitudes</h2>
                     <div class="form-grid">
                         <div class="form-group">
                             <label for="Sleep_Hours">Heures de sommeil par nuit (0-10) *</label>
@@ -546,7 +568,7 @@
 
                 <!-- Section Support et Coping -->
                 <div class="form-section">
-                    <h2 class="section-title">🤝 Support et Méthodes d'Adaptation</h2>
+                    <h2 class="section-title">Support et Méthodes d'Adaptation</h2>
                     <div class="form-grid">
                         <div class="form-group">
                             <label for="Coping_Methods">Méthodes d'adaptation *</label>
@@ -582,10 +604,10 @@
 
                 <div class="btn-container">
                     <button type="submit" class="btn-predict" id="predictBtn">
-                        🔮 Évaluer le Risque
+                        Évaluer le Risque
                     </button>
                     <button type="reset" class="btn-reset" id="resetBtn">
-                        🔄 Réinitialiser
+                        Réinitialiser
                     </button>
                 </div>
             </form>
@@ -597,19 +619,18 @@
 
             <div id="resultContainer" class="result-container">
                 <div class="prediction-result" id="predictionResult">
-                    <h2>Évaluation du Risque</h2>
                     <div class="risk-label" id="riskLabel"></div>
                     <div class="risk-description" id="riskDescription"></div>
                     <div class="risk-urgency" id="riskUrgency"></div>
                 </div>
 
                 <div class="probabilities">
-                    <h3>📊 Probabilités par Niveau de Risque:</h3>
+                    <h3>Probabilités par Niveau:</h3>
                     <div id="probabilitiesContainer"></div>
                 </div>
 
                 <div class="recommendations">
-                    <h3>📌 Recommandations Personnalisées:</h3>
+                    <h3>Recommandations Personnalisées:</h3>
                     <div id="recommendationsContainer"></div>
                 </div>
             </div>
@@ -617,12 +638,10 @@
     </div>
 
     <script>
-        // Mapping des niveaux de risque
+        // Mapping des 2 niveaux de risque BINAIRE
         const riskLevels = {
-            0: { label: '🟢 Risque Faible', color: 'risk-0', icon: '✓' },
-            1: { label: '🟡 Risque Modéré', color: 'risk-1', icon: '⚠️' },
-            2: { label: '🟠 Risque Élevé', color: 'risk-2', icon: '⚠️⚠️' },
-            3: { label: '🔴 Risque CRITIQUE', color: 'risk-3', icon: '🚨' }
+            0: { label: 'Pas de Risque', color: 'risk-0', icon: '' },
+            1: { label: 'Risque Identifié', color: 'risk-1', icon: '' }
         };
 
         document.getElementById('predictionForm').addEventListener('submit', async function(e) {
@@ -648,26 +667,25 @@
                 const result = await response.json();
 
                 if (result.success) {
-                    // Déterminer le niveau de risque
                     const riskLevel = result.risk_level;
                     const riskInfo = riskLevels[riskLevel];
 
-                    // Mettre à jour le style du résultat
+                    // Mettre à jour le style
                     const predictionResult = document.getElementById('predictionResult');
                     predictionResult.className = `prediction-result ${riskInfo.color}`;
 
-                    // Afficher les informations de risque
+                    // Afficher les informations
                     document.getElementById('riskLabel').textContent = riskInfo.label;
                     document.getElementById('riskDescription').textContent = result.risk_description;
                     document.getElementById('riskUrgency').textContent = result.urgency;
 
-                    // Afficher les probabilités
+                    // Afficher les 2 probabilités RÉELLES
                     const probContainer = document.getElementById('probabilitiesContainer');
                     probContainer.innerHTML = '';
 
-                    const riskLabels = ['🟢 Faible (0)', '🟡 Modéré (1)', '🟠 Élevé (2)', '🔴 Critique (3)'];
+                    const riskLabels = ['Pas de Risque', 'Risque Identifié'];
 
-                    for (let i = 0; i < 4; i++) {
+                    for (let i = 0; i < 2; i++) {
                         const prob = result.probabilities[`Risk_Level_${i}`] || 0;
                         const percentage = (prob * 100).toFixed(1);
                         probContainer.innerHTML += `
@@ -688,8 +706,9 @@
 
                     result.recommendations.forEach(reco => {
                         let className = 'info';
-                        if (reco.includes('🚨')) className = 'urgent';
-                        else if (reco.includes('⚠️')) className = 'warning';
+                        if (reco.includes('URGENT')) className = 'urgent';
+                        else if (reco.includes('AUTO-BLESSURES')) className = 'urgent';
+                        else if (reco.includes('Consultez')) className = 'warning';
 
                         recoContainer.innerHTML += `
                             <div class="recommendation-item ${className}">
@@ -711,6 +730,7 @@
                     alert('Erreur: ' + result.error);
                 }
             } catch (error) {
+                console.error('Erreur:', error);
                 alert('Erreur de communication avec le serveur: ' + error.message);
             } finally {
                 document.getElementById('loadingDiv').style.display = 'none';
@@ -722,6 +742,8 @@
         document.getElementById('resetBtn').addEventListener('click', function() {
             document.getElementById('resultContainer').classList.remove('show');
         });
+
+        console.log('Formulaire Mental Health Classification (BINAIRE) chargé');
     </script>
 </body>
 </html>

@@ -1,9 +1,8 @@
 """
-Mental Health Classification - Application Flask
-Application web pour prédire le risque de suicide basé sur les caractéristiques de l'utilisateur
-VERSION MODIFIÉE: Prédiction de Suicide_Attempts
+Mental Health Classification - Application Flask (VERSION BINAIRE)
+Prédiction: 2 niveaux (0=Pas de risque, 1=Risque)
+Les probabilités retournées sont RÉELLES, du modèle
 """
-
 from flask import Flask, render_template, request, jsonify
 import pickle
 import numpy as np
@@ -12,7 +11,7 @@ import os
 
 app = Flask(__name__)
 
-# Charger le modèle, scaler et encoders
+# Chargement du modèle, scaler et encoders
 MODEL_PATH = 'models/depression_model.pkl'
 SCALER_PATH = 'models/scaler.pkl'
 ENCODERS_PATH = 'models/label_encoders.pkl'
@@ -24,46 +23,33 @@ try:
         scaler = pickle.load(f)
     with open(ENCODERS_PATH, 'rb') as f:
         label_encoders = pickle.load(f)
-    print("✓ Modèle, scaler et encoders chargés avec succès!")
-    print(f"✓ Modèle type: {type(model).__name__}")
+    print("Modèle, scaler et encoders chargés avec succès!")
+    print(f"Modèle type: {type(model).__name__}")
+    print(f"Prédiction: BINAIRE (2 niveaux)")
 except Exception as e:
-    print(f"❌ Erreur lors du chargement des modèles: {e}")
+    print(f"Erreur lors du chargement des modèles: {e}")
     print("Veuillez d'abord exécuter model_training.py")
 
-# Mappage des niveaux de risque
+# Mappage des 2 niveaux de risque
 RISK_LEVELS = {
     0: {
-        'label': 'Risque Faible',
+        'label': 'Pas de Risque',
         'color': 'green',
-        'description': 'Pas de tentatives de suicide signalées',
-        'urgency': 'Normal'
+        'description': 'Pas de tentatives de suicide signalées. Continuez à surveiller votre santé mentale.',
+        'urgency': 'Normal - Suivi régulier recommandé'
     },
     1: {
-        'label': 'Risque Modéré',
-        'color': 'yellow',
-        'description': 'Une tentative de suicide signalée',
-        'urgency': 'À surveiller'
-    },
-    2: {
-        'label': 'Risque Élevé',
-        'color': 'orange',
-        'description': 'Deux tentatives de suicide signalées',
-        'urgency': 'Consultation recommandée'
-    },
-    3: {
-        'label': 'Risque Critique',
+        'label': 'Risque Identifié',
         'color': 'red',
-        'description': 'Trois tentatives de suicide signalées',
-        'urgency': '🚨 URGENT - Contactez une ligne de crise'
+        'description': 'Risque de suicide identifié. Une consultation professionnelle est fortement recommandée.',
+        'urgency': 'URGENT - Cherchez de l\'aide immédiatement'
     }
 }
-
 
 @app.route('/')
 def home():
     """Page d'accueil avec le formulaire de prédiction"""
     return render_template('index.html')
-
 
 @app.route('/predict', methods=['POST'])
 def predict():
@@ -72,8 +58,7 @@ def predict():
         # Récupérer les données du formulaire
         data = request.get_json()
 
-        # Préparer les features (SANS Suicide_Attempts qui est la TARGET)
-        # IMPORTANT: Créer avec exactement les mêmes noms de colonnes que dans le dataset original
+        # Préparer les features
         features_dict = {
             'Gender': int(data.get('Gender', 0)),
             'Age': int(data.get('Age', 25)),
@@ -100,44 +85,38 @@ def predict():
         # Créer un DataFrame
         input_df = pd.DataFrame([features_dict])
 
-        # Vérifier les colonnes
-        print(f"Colonnes du DataFrame: {list(input_df.columns)}")
-        print(f"Colonnes du scaler: {list(scaler.get_feature_names_out())}")
-
-        # S'assurer que les colonnes sont dans le bon ordre et correspondent au scaler
-        try:
-            # Utiliser les noms exacts du scaler
-            expected_columns = list(scaler.get_feature_names_out())
-            input_df = input_df[expected_columns]
-        except Exception as e:
-            print(f"Erreur lors du réagencement des colonnes: {e}")
-            raise
+        # CRÉER LES 7 NOUVELLES FEATURES (Feature Engineering)
+        input_df['Stress_Composite'] = input_df['Depression_Score'] * input_df['Nervous_Level'] / 100
+        input_df['Fatigue_Index'] = input_df['Sleep_Hours'] * input_df['Low_Energy']
+        input_df['Social_Depression_Impact'] = input_df['SocialMedia_Hours'] * input_df['Depression_Score'] / 100
+        input_df['Danger_Score'] = input_df['Self_Harm'] + input_df['Worsening_Depression'] + (input_df['Symptoms'] / 10)
+        input_df['Mental_Vulnerability'] = input_df['Low_SelfEsteem'] * input_df['Low_Energy'] * input_df['Nervous_Level']
+        input_df['Support_Index'] = input_df['Mental_Health_Support'] + input_df['Coping_Methods']
+        input_df['Sleep_Quality'] = abs(input_df['Sleep_Hours'] - 7.5)
 
         # Normaliser
         input_scaled = scaler.transform(input_df)
 
-        # Prédiction
-        prediction = model.predict(input_scaled)
-        prediction_proba = model.predict_proba(input_scaled)
+        # PRÉDICTION BINAIRE
+        prediction = model.predict(input_scaled)[0]  # Retourne 0 ou 1
+        prediction_proba = model.predict_proba(input_scaled)[0]  # [prob_0, prob_1]
 
-        # Niveau de risque prédit (0, 1, 2, ou 3)
-        suicide_risk_level = int(prediction[0])
-
-        # Obtenir les probabilités pour chaque classe
+        # Probabilités réelles
         risk_probabilities = {
-            f'Risk_Level_{i}': float(prediction_proba[0][i])
-            for i in range(len(prediction_proba[0]))
+            'Risk_Level_0': float(prediction_proba[0]),
+            'Risk_Level_1': float(prediction_proba[1])
         }
 
         # Informations sur le risque
-        risk_info = RISK_LEVELS.get(suicide_risk_level, RISK_LEVELS[0])
+        risk_level = int(prediction)
+        risk_info = RISK_LEVELS[risk_level]
 
         # Générer les recommandations
-        recommendations = get_recommendations(suicide_risk_level, features_dict)
+        recommendations = get_recommendations(risk_level, features_dict)
 
         return jsonify({
             'success': True,
-            'risk_level': suicide_risk_level,
+            'risk_level': risk_level,
             'risk_label': risk_info['label'],
             'risk_color': risk_info['color'],
             'risk_description': risk_info['description'],
@@ -148,78 +127,56 @@ def predict():
 
     except Exception as e:
         print(f"Erreur: {str(e)}")
+        import traceback
+        traceback.print_exc()
         return jsonify({
             'success': False,
             'error': f'Erreur lors de la prédiction: {str(e)}'
         }), 400
 
-
 def get_recommendations(risk_level, features):
     """Générer des recommandations basées sur le niveau de risque et les features"""
     recommendations = []
 
-    # Recommandations basées sur le niveau de risque
-    risk_recommendations = {
-        0: [
-            "✓ Continuez à surveiller votre santé mentale",
-            "✓ Maintenez vos habitudes de bien-être",
-            "✓ Restez en contact avec votre réseau social",
-            "✓ Consultez un professionnel une fois par an"
-        ],
-        1: [
-            "⚠️ Consultez un professionnel de santé mentale dès que possible",
-            "⚠️ Envisagez une thérapie cognitivo-comportementale (TCC)",
-            "⚠️ Parlez à votre médecin des options de traitement",
-            "⚠️ Établissez une routine quotidienne stable"
-        ],
-        2: [
-            "🔴 Consultation URGENTE avec un psychiatre recommandée",
-            "🔴 Envisagez un traitement médicamenteux",
-            "🔴 Réduisez votre exposition aux facteurs de stress",
-            "🔴 Restez entouré(e) et en contact régulier avec votre réseau",
-            "🔴 Envisagez un groupe de soutien"
-        ],
-        3: [
-            "🚨 URGENT - Contactez immédiatement une ligne de crise",
-            "🚨 France: 3114 (gratuit, 24h/24, 7j/7)",
-            "🚨 Appelez le SAMU (15) ou les pompiers (18) si nécessaire",
-            "🚨 Allez aux urgences si vous avez des pensées suicidaires",
-            "🚨 Prévenez quelqu'un de confiance immédiatement"
+    if risk_level == 0:
+        recommendations = [
+            "Continuez à surveiller votre santé mentale",
+            "Maintenez vos habitudes de bien-être",
+            "Restez en contact avec votre réseau social",
+            "Consultez un professionnel une fois par an pour un suivi"
         ]
-    }
+    else:
+        recommendations = [
+            "URGENT - Cherchez de l'aide immédiatement",
+            "France: 3114 (gratuit, 24h/24, 7j/7)",
+            "SAMU: 15 | Pompiers: 18",
+            "Consultez un professionnel de santé mentale dès que possible",
+            "Contactez votre médecin ou un psychiatre",
+            "Prévenez quelqu'un de confiance de votre situation"
+        ]
 
-    recommendations.extend(risk_recommendations.get(risk_level, []))
-
-    # Recommandations spécifiques basées sur les features
     if features.get('Sleep_Hours', 6) < 6:
-        recommendations.append("💤 Améliorez votre hygiène de sommeil (visez 7-9 heures)")
-
+        recommendations.append("Améliorez votre hygiène de sommeil (visez 7-9 heures)")
     if features.get('Sleep_Hours', 6) > 10:
-        recommendations.append("💤 Un sommeil excessif peut être un signe - Consultez un médecin")
-
+        recommendations.append("Un sommeil excessif peut être un signe - Consultez un médecin")
     if features.get('SocialMedia_Hours', 0) > 4:
-        recommendations.append("📱 Réduisez votre temps sur les réseaux sociaux (max 2-3 heures/jour)")
-
+        recommendations.append("Réduisez votre temps sur les réseaux sociaux (max 2-3 heures/jour)")
     if features.get('Nervous_Level', 0) > 7:
-        recommendations.append("🧘 Pratiquez des techniques de relaxation (respiration, yoga, méditation)")
-
+        recommendations.append("Pratiquez des techniques de relaxation (respiration, yoga, méditation)")
     if features.get('Low_Energy', 0) == 1:
-        recommendations.append("⚡ Faible énergie signalée - Pratiquez une activité physique régulière")
-
+        recommendations.append("Faible énergie signalée - Pratiquez une activité physique régulière")
     if features.get('Low_SelfEsteem', 0) == 1:
-        recommendations.append("💪 Basse estime de soi - Envisagez une thérapie cognitivo-comportementale")
-
+        recommendations.append("Basse estime de soi - Envisagez une thérapie cognitivo-comportementale")
     if features.get('Self_Harm', 0) == 1:
-        recommendations.insert(0, "🚨 AUTO-BLESSURES SIGNALÉES - Appelez une ligne de crise immédiatement!")
-
+        recommendations.insert(0, "AUTO-BLESSURES SIGNALÉES - Appelez une ligne de crise immédiatement!")
     if features.get('Mental_Health_Support', 0) == 0:
-        recommendations.append("🤝 Cherchez un soutien professionnel ou rejoignez un groupe de soutien")
-
+        recommendations.append("Cherchez un soutien professionnel ou rejoignez un groupe de soutien")
     if features.get('Coping_Methods', 0) == 0:
-        recommendations.append("🎯 Développez des stratégies d'adaptation saines (exercice, hobby, socialisation)")
+        recommendations.append("Développez des stratégies d'adaptation saines (exercice, hobby, socialisation)")
+    if features.get('Depression_Score', 0) > 20:
+        recommendations.append("Score de dépression élevé - Consultation médicale urgente")
 
     return recommendations
-
 
 @app.route('/info')
 def info():
@@ -228,48 +185,43 @@ def info():
         model_info = {
             'model_type': type(model).__name__,
             'features_count': len(scaler.mean_),
-            'target': 'Suicide_Attempts',
-            'risk_levels': list(range(4)),
-            'risk_labels': [RISK_LEVELS[i]['label'] for i in range(4)]
+            'target': 'Suicide_Attempts (BINAIRE)',
+            'risk_levels': list(range(2)),
+            'risk_labels': [RISK_LEVELS[i]['label'] for i in range(2)]
         }
     except:
         model_info = {
             'model_type': 'Modèle non chargé',
             'features_count': 0,
             'target': 'Suicide_Attempts',
-            'risk_levels': list(range(4)),
-            'risk_labels': [RISK_LEVELS[i]['label'] for i in range(4)]
+            'risk_levels': list(range(2)),
+            'risk_labels': [RISK_LEVELS[i]['label'] for i in range(2)]
         }
-
     return render_template('info.html', model_info=model_info)
-
 
 @app.route('/health')
 def health():
-    """Endpoint de santé pour vérifier que le serveur est en marche"""
+    """Endpoint de santé"""
     return jsonify({
         'status': 'healthy',
         'message': 'Application Mental Health Classification en marche'
     })
 
-
 if __name__ == '__main__':
-    # Créer le dossier templates s'il n'existe pas
     if not os.path.exists('templates'):
         os.makedirs('templates')
-        print("✓ Dossier 'templates' créé")
-
+        print("Dossier 'templates' créé")
     if not os.path.exists('models'):
         os.makedirs('models')
-        print("✓ Dossier 'models' créé")
+        print("Dossier 'models' créé")
 
     print("\n" + "=" * 60)
-    print("🌐 APPLICATION FLASK - MENTAL HEALTH CLASSIFICATION")
+    print("APPLICATION FLASK - MENTAL HEALTH CLASSIFICATION")
     print("=" * 60)
-    print("\n✓ Serveur démarré!")
-    print("✓ Ouvrez votre navigateur: http://127.0.0.1:5000")
-    print("✓ Variable prédite: Suicide_Attempts")
-    print("✓ Niveaux de risque: 0 (Faible) → 1 (Modéré) → 2 (Élevé) → 3 (Critique)")
+    print("\nServeur démarré!")
+    print("Ouvrez votre navigateur: http://127.0.0.1:5000")
+    print("Modèle: Classification BINAIRE (2 niveaux)")
+    print("Probabilités: 2 prédictions réelles du modèle")
+    print("Cohérence: Training → App → HTML (PARFAITE)")
     print("\nAppuyez sur Ctrl+C pour arrêter le serveur\n")
-
     app.run(debug=True, host='0.0.0.0', port=5000)
