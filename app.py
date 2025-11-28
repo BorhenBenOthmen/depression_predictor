@@ -48,6 +48,7 @@ RISK_LEVELS = {
 
 @app.route('/')
 def home():
+
     """Page d'accueil avec le formulaire de prédiction"""
     return render_template('index.html')
 

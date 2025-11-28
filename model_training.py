@@ -302,12 +302,12 @@ def select_best_model(results, trained_models):
     best_model = trained_models[best_model_name]
     best_metrics = results[best_model_name]
 
-    print(f"\n🏆 Meilleur modèle: {best_model_name}")
+    print(f"\n Meilleur modèle: {best_model_name}")
     print(f"   Accuracy:  {best_metrics['accuracy']:.4f}")
     print(f"   F1-Score:  {best_metrics['f1']:.4f}")
     print(f"   ROC-AUC:   {best_metrics['roc_auc']:.4f}")
 
-    print(f"\n📊 Classement de tous les modèles (par F1-Score):")
+    print(f"\n Classement de tous les modèles (par F1-Score):")
     sorted_results = sorted(results.items(), key=lambda x: x[1]['f1'], reverse=True)
     for i, (name, metrics) in enumerate(sorted_results, 1):
         print(f"   {i}. {name}")
@@ -378,7 +378,7 @@ def main():
         save_model_and_artifacts(best_model, scaler, label_encoders, best_model_name)
 
         print("\n" + "=" * 60)
-        print("✅ ENTRAÎNEMENT TERMINÉ AVEC SUCCÈS!")
+        print(" ENTRAÎNEMENT TERMINÉ AVEC SUCCÈS!")
         print("=" * 60)
         print("\nLes fichiers suivants ont été créés:")
         print("  - models/depression_model.pkl")
@@ -387,13 +387,9 @@ def main():
         print("\nAMÉLIORATIONS APPORTÉES:")
         print("  ✓ Prédiction BINAIRE (Pas de risque vs Risque)")
         print("  ✓ 7 nouvelles features composites créées")
-        print("  ✓ class_weight='balanced' pour gérer le déséquilibre")
-        print("  ✓ Hyperparamètres optimisés")
-        print("  ✓ Cohérence totale: Training → App → HTML")
-        print("\nVous pouvez maintenant utiliser l'application Flask (app.py)")
 
     except Exception as e:
-        print(f"\n❌ ERREUR: {str(e)}")
+        print(f"\n ERREUR: {str(e)}")
         import traceback
         traceback.print_exc()
 
