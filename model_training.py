@@ -202,8 +202,8 @@ def evaluate_models(best_models, X_test, y_test):
         axes[idx].set_title(f'Matrice Confusion - {name}', fontsize=12, fontweight='bold')
 
     plt.tight_layout()
-    plt.savefig('visualizations/07_confusion_matrices.png', dpi=300, bbox_inches='tight')
-    print("\n✓ Matrice sauvegardée: visualizations/07_confusion_matrices.png")
+    plt.savefig('visualizations/10_MODELS_CONFUSION_MATRICES.png', dpi=300, bbox_inches='tight')
+    print("\n✓ Matrice sauvegardée: 10_MODELS_CONFUSION_MATRICES.png")
     plt.show()
 
     return results
@@ -245,13 +245,13 @@ def create_summary(results):
         table[(0, i)].set_text_props(weight='bold', color='white')
 
     plt.title('Tableau Récapitulatif des Performances', fontsize=14, fontweight='bold', pad=20)
-    plt.savefig('visualizations/08_summary_table.png', dpi=300, bbox_inches='tight')
-    print("\n✓ Tableau sauvegardé: visualizations/08_summary_table.png")
+    plt.savefig('visualizations/11_MODELS_PERFORMANCE_SUMMARY.png', dpi=300, bbox_inches='tight')
+    print("\n✓ Tableau sauvegardé: 11_MODELS_PERFORMANCE_SUMMARY.png")
     plt.show()
 
     # Sauvegarder CSV
-    summary_df.to_csv('results/summary_performances.csv', index=False)
-    print("✓ CSV sauvegardé: results/summary_performances.csv")
+    summary_df.to_csv('results/MODELS_PERFORMANCE_COMPARISON.csv', index=False)
+    print("✓ CSV sauvegardé: MODELS_PERFORMANCE_COMPARISON.csv")
 
     return summary_df
 
@@ -276,8 +276,8 @@ def plot_roc_curves(results, y_test):
         axes[idx].grid(alpha=0.3)
 
     plt.tight_layout()
-    plt.savefig('visualizations/09_roc_curves.png', dpi=300, bbox_inches='tight')
-    print("\n✓ Courbes ROC sauvegardées: visualizations/09_roc_curves.png")
+    plt.savefig('visualizations/12_MODELS_ROC_CURVES.png', dpi=300, bbox_inches='tight')
+    print("\n✓ Courbes ROC sauvegardées: 12_MODELS_ROC_CURVES.png")
     plt.show()
 
 
@@ -330,11 +330,13 @@ def main():
         print("\n" + "=" * 80)
         print(" PROJET TERMINÉ!")
         print("=" * 80)
-        print(f"\n Meilleur modèle: {best_model_name}")
+        print(f"\n🏆 Meilleur modèle: {best_model_name}")
         print(f"   F1-Score: {results[best_model_name]['f1']:.4f}")
         print("\n Fichiers générés:")
-        print("   ✓ visualizations/ (4 graphiques)")
-        print("   ✓ results/summary_performances.csv")
+        print("   ✓ 10_MODELS_CONFUSION_MATRICES.png")
+        print("   ✓ 11_MODELS_PERFORMANCE_SUMMARY.png")
+        print("   ✓ 12_MODELS_ROC_CURVES.png")
+        print("   ✓ MODELS_PERFORMANCE_COMPARISON.csv")
         print("   ✓ models/")
 
     except Exception as e:
