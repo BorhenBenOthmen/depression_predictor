@@ -1,7 +1,8 @@
 """
-Mental Health Classification - Application Flask (VERSION BINAIRE)
+Mental Health Classification - Application Flask (VERSION TUNISIE)
 Prédiction: 2 niveaux (0=Pas de risque, 1=Risque)
 Les probabilités retournées sont RÉELLES, du modèle
+Numéros d'urgence Tunisiens + Améliorations UX
 """
 from flask import Flask, render_template, request, jsonify
 import pickle
@@ -33,22 +34,21 @@ except Exception as e:
 # Mappage des 2 niveaux de risque
 RISK_LEVELS = {
     0: {
-        'label': 'Pas de Risque',
+        'label': 'Pas de Risque Identifié',
         'color': 'green',
-        'description': 'Pas de tentatives de suicide signalées. Continuez à surveiller votre santé mentale.',
-        'urgency': 'Normal - Suivi régulier recommandé'
+        'description': 'Selon notre évaluation, aucun signe critique de risque suicidaire n\'a été détecté. Continuez à surveiller votre santé mentale et maintenez vos habitudes de bien-être.',
+        'urgency': 'Suivi régulier recommandé'
     },
     1: {
-        'label': 'Risque Identifié',
+        'label': 'Risque Identifié - Action Immédiate Recommandée',
         'color': 'red',
-        'description': 'Risque de suicide identifié. Une consultation professionnelle est fortement recommandée.',
-        'urgency': 'URGENT - Cherchez de l\'aide immédiatement'
+        'description': 'Notre évaluation a détecté des indicateurs de risque. Il est fortement recommandé de contacter immédiatement un professionnel de santé mentale ou une ligne d\'écoute.',
+        'urgency': 'ACTION IMMÉDIATE REQUISE'
     }
 }
 
 @app.route('/')
 def home():
-
     """Page d'accueil avec le formulaire de prédiction"""
     return render_template('index.html')
 
@@ -141,41 +141,57 @@ def get_recommendations(risk_level, features):
 
     if risk_level == 0:
         recommendations = [
-            "Continuez à surveiller votre santé mentale",
-            "Maintenez vos habitudes de bien-être",
-            "Restez en contact avec votre réseau social",
-            "Consultez un professionnel une fois par an pour un suivi"
+            "Continuez à surveiller votre santé mentale régulièrement",
+            "Maintenez vos habitudes de bien-être et d'activité physique",
+            "Restez en contact régulier avec votre réseau social",
+            "Consultez un professionnel de santé pour un suivi annuel"
         ]
     else:
         recommendations = [
-            "URGENT - Cherchez de l'aide immédiatement",
-            "France: 3114 (gratuit, 24h/24, 7j/7)",
-            "SAMU: 15 | Pompiers: 18",
-            "Consultez un professionnel de santé mentale dès que possible",
-            "Contactez votre médecin ou un psychiatre",
-            "Prévenez quelqu'un de confiance de votre situation"
+            "CONTACTEZ IMMÉDIATEMENT UN PROFESSIONNEL DE SANTÉ",
+            "Ressources en Tunisie:",
+            "  - Numéro National d'Écoute: 1445 (gratuit, 24h/24)",
+            "  - Urgences Médicales: 15",
+            "  - Pompiers/Secours: 198",
+            "  - Samu Social: 215 836 666",
+            "Contactez votre médecin généraliste ou un psychiatre",
+            "Prévenez un membre de la famille ou un proche de confiance"
         ]
 
-    if features.get('Sleep_Hours', 6) < 6:
-        recommendations.append("Améliorez votre hygiène de sommeil (visez 7-9 heures)")
-    if features.get('Sleep_Hours', 6) > 10:
-        recommendations.append("Un sommeil excessif peut être un signe - Consultez un médecin")
-    if features.get('SocialMedia_Hours', 0) > 4:
-        recommendations.append("Réduisez votre temps sur les réseaux sociaux (max 2-3 heures/jour)")
-    if features.get('Nervous_Level', 0) > 7:
-        recommendations.append("Pratiquez des techniques de relaxation (respiration, yoga, méditation)")
+    # Recommandations spécifiques basées sur les features détectées
+    if features.get('Sleep_Hours', 6) < 5:
+        recommendations.append("IMPORTANT: Votre sommeil est très insuffisant (moins de 5h/nuit). Cela peut aggraver votre état mental. Cherchez de l'aide")
+    elif features.get('Sleep_Hours', 6) < 6:
+        recommendations.append("Votre sommeil semble insuffisant. Essayez d'améliorer votre hygiène de sommeil (visez 7-9 heures)")
+    elif features.get('Sleep_Hours', 6) > 12:
+        recommendations.append("Un sommeil excessif (plus de 12h/nuit) peut être un signe de dépression. Consultez un médecin")
+
+    if features.get('SocialMedia_Hours', 0) > 6:
+        recommendations.append("Vous passez beaucoup de temps sur les réseaux sociaux (plus de 6h/jour). Réduisez ce temps, cela peut affecter votre santé mentale")
+
+    if features.get('Nervous_Level', 0) > 8:
+        recommendations.append("Vous signalerez un niveau d'anxiété très élevé. Pratiquez la méditation, la respiration profonde ou contactez un professionnel")
+
     if features.get('Low_Energy', 0) == 1:
-        recommendations.append("Faible énergie signalée - Pratiquez une activité physique régulière")
+        recommendations.append("Vous avez signalé une faible énergie. Essayez une activité physique régulière (même 20 minutes de marche par jour)")
+
     if features.get('Low_SelfEsteem', 0) == 1:
-        recommendations.append("Basse estime de soi - Envisagez une thérapie cognitivo-comportementale")
+        recommendations.append("Une faible estime de soi a été détectée. Une thérapie ou un groupe de soutien pourrait vous aider")
+
     if features.get('Self_Harm', 0) == 1:
-        recommendations.insert(0, "AUTO-BLESSURES SIGNALÉES - Appelez une ligne de crise immédiatement!")
+        recommendations.insert(0, "ALERTE: Auto-mutilation signalée. Contactez immédiatement un professionnel au 1445 ou allez à l'hôpital le plus proche")
+
+    if features.get('Depression_Score', 0) > 25:
+        recommendations.insert(0, "ALERTE: Score de dépression très élevé détecté. Une intervention médicale est urgente")
+
     if features.get('Mental_Health_Support', 0) == 0:
-        recommendations.append("Cherchez un soutien professionnel ou rejoignez un groupe de soutien")
+        recommendations.append("Vous n'avez pas signalé de soutien professionnel. N'hésitez pas à chercher de l'aide - c'est important!")
+
     if features.get('Coping_Methods', 0) == 0:
-        recommendations.append("Développez des stratégies d'adaptation saines (exercice, hobby, socialisation)")
-    if features.get('Depression_Score', 0) > 20:
-        recommendations.append("Score de dépression élevé - Consultation médicale urgente")
+        recommendations.append("Développez des stratégies d'adaptation: exercice, loisirs, socialisation, ou autres activités que vous aimez")
+
+    if features.get('Worsening_Depression', 0) == 1:
+        recommendations.append("Vous avez indiqué une aggravation récente. Ne temporisez pas - contactez un professionnel au plus tôt")
 
     return recommendations
 
@@ -186,7 +202,7 @@ def info():
         model_info = {
             'model_type': type(model).__name__,
             'features_count': len(scaler.mean_),
-            'target': 'Suicide_Attempts (BINAIRE)',
+            'target': 'Évaluation du Risque Suicidaire',
             'risk_levels': list(range(2)),
             'risk_labels': [RISK_LEVELS[i]['label'] for i in range(2)]
         }
@@ -194,7 +210,7 @@ def info():
         model_info = {
             'model_type': 'Modèle non chargé',
             'features_count': 0,
-            'target': 'Suicide_Attempts',
+            'target': 'Évaluation du Risque Suicidaire',
             'risk_levels': list(range(2)),
             'risk_labels': [RISK_LEVELS[i]['label'] for i in range(2)]
         }
@@ -221,8 +237,7 @@ if __name__ == '__main__':
     print("=" * 60)
     print("\nServeur démarré!")
     print("Ouvrez votre navigateur: http://127.0.0.1:5000")
+    print("Version: Tunisie - Numéros d'urgence locaux")
     print("Modèle: Classification BINAIRE (2 niveaux)")
-    print("Probabilités: 2 prédictions réelles du modèle")
-    print("Cohérence: Training → App → HTML (PARFAITE)")
     print("\nAppuyez sur Ctrl+C pour arrêter le serveur\n")
     app.run(debug=True, host='0.0.0.0', port=5000)

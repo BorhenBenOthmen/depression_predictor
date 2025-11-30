@@ -3,9 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mental Health Classification - Prédiction du Risque de Suicide</title>
+    <title>Évaluation Santé Mentale - Aide Psychologique</title>
     <style>
-
         * {
             margin: 0;
             padding: 0;
@@ -20,7 +19,7 @@
         }
 
         .container {
-            max-width: 900px;
+            max-width: 1000px;
             margin: 0 auto;
             background: white;
             border-radius: 20px;
@@ -31,7 +30,7 @@
         .header {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            padding: 30px;
+            padding: 40px 30px;
             text-align: center;
         }
 
@@ -49,22 +48,65 @@
             padding: 40px;
         }
 
-        .form-section {
+        .critical-warning {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            padding: 20px;
+            border-radius: 10px;
             margin-bottom: 30px;
+        }
+
+        .critical-warning h3 {
+            color: #856404;
+            margin-bottom: 15px;
+            font-size: 1.2em;
+        }
+
+        .critical-warning p {
+            color: #856404;
+            margin: 8px 0;
+            line-height: 1.6;
+        }
+
+        .critical-warning .contact-info {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            font-weight: 600;
+        }
+
+        .info-box {
+            background: #e7f3ff;
+            border-left: 5px solid #2196F3;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+
+        .info-box p {
+            color: #0c5aa0;
+            line-height: 1.6;
+            margin: 8px 0;
+        }
+
+        .form-section {
+            margin-bottom: 35px;
+            padding-bottom: 25px;
+            border-bottom: 2px solid #f0f0f0;
         }
 
         .section-title {
             font-size: 1.5em;
             color: #667eea;
             margin-bottom: 20px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid #667eea;
+            font-weight: 600;
         }
 
         .form-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
         }
 
         .form-group {
@@ -77,6 +119,39 @@
             margin-bottom: 8px;
             color: #333;
             font-size: 0.95em;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .help-icon {
+            width: 20px;
+            height: 20px;
+            background: #667eea;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8em;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .help-text {
+            display: none;
+            background: #f9f9f9;
+            border: 1px solid #ddd;
+            padding: 12px;
+            margin-top: 8px;
+            border-radius: 6px;
+            font-size: 0.9em;
+            color: #555;
+            line-height: 1.5;
+        }
+
+        .form-group:hover .help-text {
+            display: block;
         }
 
         input, select {
@@ -93,11 +168,33 @@
             box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
         }
 
+        .slider-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        input[type="range"] {
+            flex: 1;
+            height: 6px;
+            cursor: pointer;
+        }
+
+        .slider-value {
+            background: #667eea;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-weight: 600;
+            min-width: 50px;
+            text-align: center;
+        }
+
         .btn-container {
             display: flex;
             justify-content: center;
-            margin-top: 30px;
-            gap: 10px;
+            margin-top: 35px;
+            gap: 15px;
         }
 
         .btn-predict {
@@ -110,7 +207,7 @@
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s;
-            box-shadow: 0<Rigidbody 4px 15px rgba(102, 126, 234, 0.4);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
         }
 
         .btn-predict:hover {
@@ -309,34 +406,6 @@
             100% { transform: rotate(360deg); }
         }
 
-        .info-box {
-            background: #e8f4f8;
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            border-left: 4px solid #3498db;
-        }
-
-        .info-box p {
-            margin: 8px 0;
-            color: #2c3e50;
-            line-height: 1.6;
-        }
-
-        .critical-warning {
-            background: #ffe6e6;
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            border-left: 4px solid #e74c3c;
-        }
-
-        .critical-warning p {
-            color: #c0392b;
-            font-weight: 600;
-            margin: 5px 0;
-        }
-
         @media (max-width: 768px) {
             .form-grid {
                 grid-template-columns: 1fr;
@@ -377,245 +446,294 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>Mental Health Classification</h1>
-            <p>Système de Prédiction du Risque de Suicide</p>
+            <h1>Evaluation de la Sante Mentale</h1>
+            <p>Système d'aide et d'orientation psychologique</p>
         </div>
 
         <div class="content">
-            <!-- AVERTISSEMENT CRITIQUE -->
+            <!-- AVERTISSEMENT COMPATIBLE TUNISIE -->
             <div class="critical-warning">
-                <p>AVERTISSEMENT IMPORTANT:</p>
-                <p>Cet outil évalue le risque basé sur l'IA, ce n'est PAS un diagnostic médical.</p>
-                <p>Si vous ou quelqu'un d'autre êtes en détresse immédiate:</p>
-                <p style="margin-top: 10px; font-size: 1.2em;">France: 3114 (24h/24, 7j/7) | SAMU: 15 | Pompiers: 18</p>
+                <h3>Avertissement Important</h3>
+                <p>Cet outil fournit une evaluation basee sur l'intelligence artificielle. Ce n'est PAS un diagnostic medical ou psychologique officiel.</p>
+                <p>Si vous ou quelqu'un d'autre etes en detresse ou avez des pensees suicidaires, veuillez contacter immediatement:</p>
+                <div class="contact-info">
+                    <p>Tunisie - Numeros d'urgence:</p>
+                    <p>- Ligne d'ecoute 24h/24: 71 283 553</p>
+                    <p>- SAMU: 15</p>
+                    <p>- Police: 17</p>
+                    <p>- Pompiers: 18</p>
+                    <p>- Centre Psychosocial Tunis: 71 579 244</p>
+                </div>
             </div>
 
             <!-- INFO BOX -->
             <div class="info-box">
-                <p><strong>Utilisation:</strong> Remplissez le formulaire ci-dessous pour obtenir une évaluation du risque de suicide.</p>
-                <p><strong>Classification:</strong> Le modèle prédit en 2 niveaux: </p>
-                <p style="margin-left: 20px; font-size: 1.05em;">
-                    <strong>Niveau 0</strong> (Pas de risque) | <strong>Niveau 1</strong> (Risque identifié)
-                </p>
-                <p><strong>Données:</strong> Vos données ne sont pas sauvegardées.</p>
+                <p><strong>Comment utiliser cet outil:</strong></p>
+                <p>Veuillez repondre honnetement aux questions ci-dessous. Toutes les donnees sont confidentielles et ne sont pas enregistrees.</p>
+                <p><strong>Objectif:</strong> Vous aider a evaluer votre etat psychologique et vous orienter vers les ressources appropriees si necessaire.</p>
+                <p>Cet outil propose deux niveaux d'evaluation: <strong>Pas de risque</strong> ou <strong>Risque identifie</strong>.</p>
             </div>
 
             <form id="predictionForm">
-                <!-- Section Informations Démographiques -->
+                <!-- Section Informations Demographiques -->
                 <div class="form-section">
-                    <h2 class="section-title">Informations Démographiques</h2>
+                    <h2 class="section-title">Informations Personnelles</h2>
                     <div class="form-grid">
                         <div class="form-group">
-                            <label for="Gender">Genre *</label>
+                            <label for="Gender">Genre <span class="help-icon" title="Information necessaire pour adapter l'evaluation">?</span></label>
                             <select id="Gender" name="Gender" required>
-                                <option value="">Sélectionnez...</option>
+                                <option value="">Selectionnez votre genre...</option>
                                 <option value="0">Homme</option>
                                 <option value="1">Femme</option>
                             </select>
+                            <div class="help-text">Votre genre est utilise pour adapter l'evaluation selon les donnees disponibles.</div>
                         </div>
 
                         <div class="form-group">
-                            <label for="Age">Âge *</label>
+                            <label for="Age">Age (en annees) <span class="help-icon" title="Votre age">?</span></label>
                             <input type="number" id="Age" name="Age" min="10" max="120" value="25" required>
+                            <div class="help-text">Votre age aide le systeme a adapter l'evaluation a votre groupe d'age.</div>
                         </div>
 
                         <div class="form-group">
-                            <label for="Education_Level">Niveau d'éducation *</label>
+                            <label for="Education_Level">Niveau d'education <span class="help-icon" title="Votre niveau d'etudes">?</span></label>
                             <select id="Education_Level" name="Education_Level" required>
-                                <option value="">Sélectionnez...</option>
-                                <option value="0">Lycée</option>
-                                <option value="1">Licence</option>
-                                <option value="2">Master</option>
-                                <option value="3">Doctorat</option>
-                                <option value="4">Aucun</option>
+                                <option value="">Selectionnez votre niveau...</option>
+                                <option value="0">Ecole primaire/secondaire</option>
+                                <option value="1">Baccalaureat/Lycee</option>
+                                <option value="2">Licence Universitaire</option>
+                                <option value="3">Master/Doctorat</option>
+                                <option value="4">Aucune formation formelle</option>
                             </select>
+                            <div class="help-text">Le niveau d'education aide a personnaliser les recommandations.</div>
                         </div>
 
                         <div class="form-group">
-                            <label for="Employment_Status">Statut d'emploi *</label>
+                            <label for="Employment_Status">Situation professionnelle <span class="help-icon" title="Votre emploi">?</span></label>
                             <select id="Employment_Status" name="Employment_Status" required>
-                                <option value="">Sélectionnez...</option>
-                                <option value="0">Employé</option>
-                                <option value="1">Chômeur</option>
-                                <option value="2">Étudiant</option>
-                                <option value="3">Indépendant</option>
+                                <option value="">Selectionnez votre situation...</option>
+                                <option value="0">Employe</option>
+                                <option value="1">Chomage/Sans emploi</option>
+                                <option value="2">Etudiant</option>
+                                <option value="3">Travailleur independant/Entrepreneur</option>
                             </select>
+                            <div class="help-text">La situation professionnelle peut affecter la sante mentale.</div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Section Symptômes -->
+                <!-- Section Symptomes - AVEC GUIDE -->
                 <div class="form-section">
-                    <h2 class="section-title">Symptômes et État Mental</h2>
+                    <h2 class="section-title">Etat Psychologique et Symptomes</h2>
                     <div class="form-grid">
                         <div class="form-group">
-                            <label for="Depression_Type">Type de dépression *</label>
+                            <label for="Depression_Type">Type de sentiments depressifs <span class="help-icon" title="Guide">?</span></label>
                             <select id="Depression_Type" name="Depression_Type" required>
-                                <option value="">Sélectionnez...</option>
-                                <option value="0">Type 0</option>
-                                <option value="1">Type 1</option>
-                                <option value="2">Type 2</option>
-                                <option value="3">Type 3</option>
-                                <option value="4">Type 4</option>
-                                <option value="5">Type 5</option>
-                                <option value="6">Type 6</option>
-                                <option value="7">Type 7</option>
-                                <option value="8">Type 8</option>
-                                <option value="9">Type 9</option>
-                                <option value="10">Type 10</option>
-                                <option value="11">Type 11</option>
+                                <option value="">Selectionnez...</option>
+                                <option value="0">Aucun sentiment depressif</option>
+                                <option value="1">Tristesse legere occasionnelle</option>
+                                <option value="2">Tristesse moderee et frequente</option>
+                                <option value="3">Sentiment depressif constant</option>
+                                <option value="4">Depression severe avec fatigue</option>
+                                <option value="5">Perte totale d'interet pour les activites</option>
+                                <option value="6">Hopelessness profonde</option>
+                                <option value="7">Depression avec isolement social</option>
+                                <option value="8">Depression avec difficultees de concentration</option>
+                                <option value="9">Depression avec problemes de sommeil</option>
+                                <option value="10">Depression avec pensees negatives persistantes</option>
+                                <option value="11">Depression tres grave et debilitante</option>
                             </select>
+                            <div class="help-text">Choisissez le type qui decrit le mieux votre etat emotionnel actuel. Si vous ne ressentez rien, selectionnez la premiere option.</div>
                         </div>
 
                         <div class="form-group">
-                            <label for="Symptoms">Nombre de symptômes (0-14) *</label>
-                            <input type="number" id="Symptoms" name="Symptoms" min="0" max="14" value="5" required>
+                            <label for="Symptoms">Nombre de symptomes physiques et emotionnels <span class="help-icon" title="Guide">?</span></label>
+                            <div class="slider-container">
+                                <input type="range" id="Symptoms" name="Symptoms" min="0" max="14" value="5">
+                                <span class="slider-value" id="symptomsValue">5</span>
+                            </div>
+                            <div class="help-text">
+                                Pensez aux symptomes tels que: insomnie, fatigue, perte d'appetit, difficulte de concentration, maux de tete, sentiments d'anxiete.
+                                Plus le nombre est eleve, plus il y a de symptomes.
+                            </div>
                         </div>
 
                         <div class="form-group">
-                            <label for="Depression_Score">Score de dépression (0-30) *</label>
-                            <input type="number" id="Depression_Score" name="Depression_Score" min="0" max="30" value="14" required>
+                            <label for="Depression_Score">Intensite generale de la depression <span class="help-icon" title="Guide">?</span></label>
+                            <div class="slider-container">
+                                <input type="range" id="Depression_Score" name="Depression_Score" min="0" max="30" value="14">
+                                <span class="slider-value" id="depressionValue">14</span>
+                            </div>
+                            <div class="help-text">
+                                De 0 (aucune depression) a 30 (depression tres grave).
+                                Cette echelle mesure l'intensite globale de votre etat depressif.
+                            </div>
                         </div>
 
                         <div class="form-group">
-                            <label for="Nervous_Level">Niveau de nervosité (0-10) *</label>
-                            <input type="number" id="Nervous_Level" name="Nervous_Level" min="0" max="10" value="5" required>
+                            <label for="Nervous_Level">Niveau d'anxiete ou de nervosité <span class="help-icon" title="Guide">?</span></label>
+                            <div class="slider-container">
+                                <input type="range" id="Nervous_Level" name="Nervous_Level" min="0" max="10" value="5">
+                                <span class="slider-value" id="nervousValue">5</span>
+                            </div>
+                            <div class="help-text">De 0 (calme) a 10 (extremement anxieux). Cela mesure votre niveau d'anxiete ou de nervosité actuel.</div>
                         </div>
 
                         <div class="form-group">
-                            <label for="Low_Energy">Faible énergie *</label>
+                            <label for="Low_Energy">Manque d'energie ou de motivation <span class="help-icon" title="Guide">?</span></label>
                             <select id="Low_Energy" name="Low_Energy" required>
-                                <option value="">Sélectionnez...</option>
-                                <option value="0">Non</option>
-                                <option value="1">Oui</option>
+                                <option value="">Selectionnez...</option>
+                                <option value="0">Non - Je me sens energique</option>
+                                <option value="1">Oui - Je me sens fatigue et sans energie</option>
                             </select>
+                            <div class="help-text">Le manque d'energie est un symptome courant de depression.</div>
                         </div>
 
                         <div class="form-group">
-                            <label for="Low_SelfEsteem">Faible estime de soi *</label>
+                            <label for="Low_SelfEsteem">Faible estime de soi <span class="help-icon" title="Guide">?</span></label>
                             <select id="Low_SelfEsteem" name="Low_SelfEsteem" required>
-                                <option value="">Sélectionnez...</option>
-                                <option value="0">Non</option>
-                                <option value="1">Oui</option>
+                                <option value="">Selectionnez...</option>
+                                <option value="0">Non - Je me sens bien dans ma peau</option>
+                                <option value="1">Oui - Je doute de ma valeur personnelle</option>
                             </select>
+                            <div class="help-text">Se sentir sans valeur est un facteur de risque important.</div>
                         </div>
                     </div>
                 </div>
 
                 <!-- Section Comportements -->
                 <div class="form-section">
-                    <h2 class="section-title">Comportements Alimentaires</h2>
+                    <h2 class="section-title">Habitudes Alimentaires et Mode de Vie</h2>
                     <div class="form-grid">
                         <div class="form-group">
-                            <label for="Your_overeating_level">Niveau de suralimentation (0-14) *</label>
-                            <input type="number" id="Your_overeating_level" name="Your_overeating_level" min="0" max="14" value="0" required>
+                            <label for="Your_overeating_level">Manger excessif ou compulsif <span class="help-icon" title="Guide">?</span></label>
+                            <div class="slider-container">
+                                <input type="range" id="Your_overeating_level" name="Your_overeating_level" min="0" max="14" value="0">
+                                <span class="slider-value" id="overeatingValue">0</span>
+                            </div>
+                            <div class="help-text">De 0 (jamais) a 14 (tres frequent). Manger compulsivement est parfois utilise comme mecanisme d'adaptation au stress.</div>
                         </div>
 
                         <div class="form-group">
-                            <label for="How_many_times_you_eat">Nombre de repas par jour *</label>
+                            <label for="How_many_times_you_eat">Regime alimentaire regulier <span class="help-icon" title="Guide">?</span></label>
                             <select id="How_many_times_you_eat" name="How_many_times_you_eat" required>
-                                <option value="">Sélectionnez...</option>
-                                <option value="0">Pas de repas régulier</option>
-                                <option value="1">Repas réguliers</option>
+                                <option value="">Selectionnez...</option>
+                                <option value="0">Non - Je n'ai pas un regime regulier</option>
+                                <option value="1">Oui - Je mange regulierement et sainement</option>
                             </select>
+                            <div class="help-text">Les habitudes alimentaires regulieres sont importantes pour la sante mentale.</div>
                         </div>
 
                         <div class="form-group">
-                            <label for="SocialMedia_WhileEating">Réseaux sociaux en mangeant *</label>
+                            <label for="SocialMedia_WhileEating">Utiliser les reseaux sociaux en mangeant <span class="help-icon" title="Guide">?</span></label>
                             <select id="SocialMedia_WhileEating" name="SocialMedia_WhileEating" required>
-                                <option value="">Sélectionnez...</option>
-                                <option value="0">Non</option>
-                                <option value="1">Oui</option>
-                                <option value="2">Parfois</option>
-                                <option value="3">Souvent</option>
+                                <option value="">Selectionnez...</option>
+                                <option value="0">Non - Je mange sans distraction</option>
+                                <option value="1">Oui - Quelquefois</option>
+                                <option value="2">Oui - Souvent</option>
+                                <option value="3">Oui - Presque tout le temps</option>
                             </select>
+                            <div class="help-text">L'exposition constante aux reseaux sociaux peut affecter la sante mentale.</div>
                         </div>
                     </div>
                 </div>
 
                 <!-- Section Mode de vie -->
                 <div class="form-section">
-                    <h2 class="section-title">Mode de Vie et Habitudes</h2>
+                    <h2 class="section-title">Sommeil et Technologie</h2>
                     <div class="form-grid">
                         <div class="form-group">
-                            <label for="Sleep_Hours">Heures de sommeil par nuit (0-10) *</label>
-                            <input type="number" id="Sleep_Hours" name="Sleep_Hours" min="0" max="10" value="7" step="0.5" required>
+                            <label for="Sleep_Hours">Heures de sommeil par nuit <span class="help-icon" title="Guide">?</span></label>
+                            <div class="slider-container">
+                                <input type="range" id="Sleep_Hours" name="Sleep_Hours" min="0" max="12" value="7" step="0.5">
+                                <span class="slider-value" id="sleepValue">7</span>
+                            </div>
+                            <div class="help-text">L'ideal est 7 a 9 heures. Trop ou trop peu de sommeil peut indiquer des problemes de sante mentale.</div>
                         </div>
 
                         <div class="form-group">
-                            <label for="SocialMedia_Hours">Heures sur réseaux sociaux/jour (0-12) *</label>
-                            <input type="number" id="SocialMedia_Hours" name="SocialMedia_Hours" min="0" max="12" value="5" required>
+                            <label for="SocialMedia_Hours">Heures par jour sur les reseaux sociaux <span class="help-icon" title="Guide">?</span></label>
+                            <div class="slider-container">
+                                <input type="range" id="SocialMedia_Hours" name="SocialMedia_Hours" min="0" max="12" value="5">
+                                <span class="slider-value" id="mediaValue">5</span>
+                            </div>
+                            <div class="help-text">L'exposition excessive aux reseaux sociaux est associee a l'anxiete et la depression.</div>
                         </div>
 
                         <div class="form-group">
-                            <label for="Search_Depression_Online">Recherche sur la dépression en ligne *</label>
+                            <label for="Search_Depression_Online">Chercher des informations sur la depression en ligne <span class="help-icon" title="Guide">?</span></label>
                             <select id="Search_Depression_Online" name="Search_Depression_Online" required>
-                                <option value="">Sélectionnez...</option>
+                                <option value="">Selectionnez...</option>
                                 <option value="0">Non</option>
-                                <option value="1">Oui</option>
+                                <option value="1">Oui - Cela aggrave mon inquietude</option>
                             </select>
+                            <div class="help-text">Rechercher excessivement ses symptomes en ligne peut augmenter l'anxiete.</div>
                         </div>
 
                         <div class="form-group">
-                            <label for="Worsening_Depression">Aggravation de la dépression *</label>
+                            <label for="Worsening_Depression">Votre depression s'aggrave <span class="help-icon" title="Guide">?</span></label>
                             <select id="Worsening_Depression" name="Worsening_Depression" required>
-                                <option value="">Sélectionnez...</option>
-                                <option value="0">Non</option>
-                                <option value="1">Oui</option>
+                                <option value="">Selectionnez...</option>
+                                <option value="0">Non - Elle reste stable ou s'ameliore</option>
+                                <option value="1">Oui - Elle s'aggrave</option>
                             </select>
+                            <div class="help-text">L'aggravation des symptomes necessite une intervention professionnelle urgente.</div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Section Support et Coping -->
+                <!-- Section Support -->
                 <div class="form-section">
-                    <h2 class="section-title">Support et Méthodes d'Adaptation</h2>
+                    <h2 class="section-title">Soutien et Ressources</h2>
                     <div class="form-grid">
                         <div class="form-group">
-                            <label for="Coping_Methods">Méthodes d'adaptation *</label>
+                            <label for="Coping_Methods">Methodes pour faire face au stress <span class="help-icon" title="Guide">?</span></label>
                             <select id="Coping_Methods" name="Coping_Methods" required>
-                                <option value="">Sélectionnez...</option>
-                                <option value="0">Exercice</option>
-                                <option value="1">Thérapie</option>
-                                <option value="2">Médicament</option>
-                                <option value="3">Soutien social</option>
-                                <option value="4">Aucune</option>
+                                <option value="">Selectionnez votre principale methode...</option>
+                                <option value="0">Exercice physique/Sport</option>
+                                <option value="1">Therapie ou Consultation professionnelle</option>
+                                <option value="2">Medicaments prescrits</option>
+                                <option value="3">Soutien famille et amis</option>
+                                <option value="4">Aucune methode efficace</option>
                             </select>
+                            <div class="help-text">Les strategies d'adaptation saines sont essentielles pour la recuperation.</div>
                         </div>
 
                         <div class="form-group">
-                            <label for="Mental_Health_Support">Support professionnel *</label>
+                            <label for="Mental_Health_Support">Soutien professionnel actuel <span class="help-icon" title="Guide">?</span></label>
                             <select id="Mental_Health_Support" name="Mental_Health_Support" required>
-                                <option value="">Sélectionnez...</option>
-                                <option value="0">Non</option>
-                                <option value="1">Oui</option>
+                                <option value="">Selectionnez...</option>
+                                <option value="0">Non - Je n'ai pas de soutien professionnel</option>
+                                <option value="1">Oui - Je vois un professionnel de sante mentale</option>
                             </select>
+                            <div class="help-text">Un professionnel peut vous aider a mieux comprendre et gerer votre situation.</div>
                         </div>
 
                         <div class="form-group">
-                            <label for="Self_Harm">Auto-mutilation *</label>
+                            <label for="Self_Harm">Auto-blessure ou pensees suicidaires <span class="help-icon" title="URGENT">?</span></label>
                             <select id="Self_Harm" name="Self_Harm" required>
-                                <option value="">Sélectionnez...</option>
-                                <option value="0">Non</option>
-                                <option value="1">Oui</option>
+                                <option value="">Selectionnez...</option>
+                                <option value="0">Non - Je n'ai jamais pense a cela</option>
+                                <option value="1">Oui - J'ai des pensees ou des comportements d'auto-blessure</option>
                             </select>
+                            <div class="help-text" style="background: #ffe6e6; color: #c0392b;">IMPORTANT: Si vous avez des pensees suicidaires, contactez immediatement les services d'urgence!</div>
                         </div>
                     </div>
                 </div>
 
                 <div class="btn-container">
                     <button type="submit" class="btn-predict" id="predictBtn">
-                        Évaluer le Risque
+                        Evaluer Mon Etat
                     </button>
                     <button type="reset" class="btn-reset" id="resetBtn">
-                        Réinitialiser
+                        Reinitialiser
                     </button>
                 </div>
             </form>
 
             <div id="loadingDiv" class="loading" style="display: none;">
                 <div class="spinner"></div>
-                <p>Analyse en cours...</p>
+                <p>Evaluation en cours...</p>
             </div>
 
             <div id="resultContainer" class="result-container">
@@ -626,12 +744,12 @@
                 </div>
 
                 <div class="probabilities">
-                    <h3>Probabilités par Niveau:</h3>
+                    <h3>Resultats de l'Evaluation:</h3>
                     <div id="probabilitiesContainer"></div>
                 </div>
 
                 <div class="recommendations">
-                    <h3>Recommandations Personnalisées:</h3>
+                    <h3>Recommandations Personnalisees:</h3>
                     <div id="recommendationsContainer"></div>
                 </div>
             </div>
@@ -639,11 +757,36 @@
     </div>
 
     <script>
-        // Mapping des 2 niveaux de risque BINAIRE
+        // Mapping des 2 niveaux de risque
         const riskLevels = {
-            0: { label: 'Pas de Risque', color: 'risk-0', icon: '' },
-            1: { label: 'Risque Identifié', color: 'risk-1', icon: '' }
+            0: { label: 'Pas de Risque Identifie', color: 'risk-0' },
+            1: { label: 'Risque Identifie', color: 'risk-1' }
         };
+
+        // Sliders pour les valeurs
+        document.getElementById('Symptoms').addEventListener('input', function() {
+            document.getElementById('symptomsValue').textContent = this.value;
+        });
+
+        document.getElementById('Depression_Score').addEventListener('input', function() {
+            document.getElementById('depressionValue').textContent = this.value;
+        });
+
+        document.getElementById('Nervous_Level').addEventListener('input', function() {
+            document.getElementById('nervousValue').textContent = this.value;
+        });
+
+        document.getElementById('Your_overeating_level').addEventListener('input', function() {
+            document.getElementById('overeatingValue').textContent = this.value;
+        });
+
+        document.getElementById('Sleep_Hours').addEventListener('input', function() {
+            document.getElementById('sleepValue').textContent = this.value;
+        });
+
+        document.getElementById('SocialMedia_Hours').addEventListener('input', function() {
+            document.getElementById('mediaValue').textContent = this.value;
+        });
 
         document.getElementById('predictionForm').addEventListener('submit', async function(e) {
             e.preventDefault();
@@ -651,7 +794,6 @@
             const formData = new FormData(e.target);
             const data = Object.fromEntries(formData.entries());
 
-            // Afficher le loading
             document.getElementById('loadingDiv').style.display = 'block';
             document.getElementById('resultContainer').classList.remove('show');
             document.getElementById('predictBtn').disabled = true;
@@ -671,20 +813,17 @@
                     const riskLevel = result.risk_level;
                     const riskInfo = riskLevels[riskLevel];
 
-                    // Mettre à jour le style
                     const predictionResult = document.getElementById('predictionResult');
                     predictionResult.className = `prediction-result ${riskInfo.color}`;
 
-                    // Afficher les informations
                     document.getElementById('riskLabel').textContent = riskInfo.label;
                     document.getElementById('riskDescription').textContent = result.risk_description;
                     document.getElementById('riskUrgency').textContent = result.urgency;
 
-                    // Afficher les 2 probabilités RÉELLES
                     const probContainer = document.getElementById('probabilitiesContainer');
                     probContainer.innerHTML = '';
 
-                    const riskLabels = ['Pas de Risque', 'Risque Identifié'];
+                    const riskLabels = ['Pas de Risque', 'Risque Identifie'];
 
                     for (let i = 0; i < 2; i++) {
                         const prob = result.probabilities[`Risk_Level_${i}`] || 0;
@@ -701,15 +840,14 @@
                         `;
                     }
 
-                    // Afficher les recommandations
                     const recoContainer = document.getElementById('recommendationsContainer');
                     recoContainer.innerHTML = '';
 
                     result.recommendations.forEach(reco => {
                         let className = 'info';
                         if (reco.includes('URGENT')) className = 'urgent';
-                        else if (reco.includes('AUTO-BLESSURES')) className = 'urgent';
-                        else if (reco.includes('Consultez')) className = 'warning';
+                        if (reco.includes('AUTO-BLESSURES')) className = 'urgent';
+                        if (reco.includes('Consultez')) className = 'warning';
 
                         recoContainer.innerHTML += `
                             <div class="recommendation-item ${className}">
@@ -718,10 +856,8 @@
                         `;
                     });
 
-                    // Afficher les résultats
                     document.getElementById('resultContainer').classList.add('show');
 
-                    // Scroller vers les résultats
                     setTimeout(() => {
                         document.getElementById('resultContainer').scrollIntoView({
                             behavior: 'smooth'
@@ -739,12 +875,9 @@
             }
         });
 
-        // Bouton reset
         document.getElementById('resetBtn').addEventListener('click', function() {
             document.getElementById('resultContainer').classList.remove('show');
         });
-
-        console.log('Formulaire Mental Health Classification (BINAIRE) chargé');
     </script>
 </body>
 </html>
