@@ -82,10 +82,10 @@ def prepare_data(df_processed):
     print("=" * 80)
 
     # Target binaire: 0 ou 1 tentative vs >=2 tentatives
-    y = (df_processed['Suicide_Attempts'] >= 1).astype(int)
+    y = (df_processed['Suicide_Attempts'] >= 2).astype(int)
 
-    print(f"✓ Classe 0 (0 tentative): {(y == 0).sum()} ({(y == 0).sum()/len(y)*100:.1f}%)")
-    print(f"✓ Classe 1 (≥1 tentatives): {(y == 1).sum()} ({(y == 1).sum()/len(y)*100:.1f}%)")
+    print(f"✓ Classe 0 (0-1 tentative): {(y == 0).sum()} ({(y == 0).sum()/len(y)*100:.1f}%)")
+    print(f"✓ Classe 1 (≥2 tentatives): {(y == 1).sum()} ({(y == 1).sum()/len(y)*100:.1f}%)")
 
     X = df_processed.drop('Suicide_Attempts', axis=1)
 

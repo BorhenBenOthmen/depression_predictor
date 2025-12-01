@@ -7,24 +7,13 @@
     <list default="true" id="7ec5e63e-1899-4cb2-99ea-3ee8706692b2" name="Changes" comment="version final">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/model_training.py" beforeDir="false" afterPath="$PROJECT_DIR$/model_training.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/depression_model.pkl" beforeDir="false" afterPath="$PROJECT_DIR$/models/depression_model.pkl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/scaler.pkl" beforeDir="false" afterPath="$PROJECT_DIR$/models/scaler.pkl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/models/depression_model.pkl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/models/label_encoders.pkl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/models/scaler.pkl" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/results/MODELS_PERFORMANCE_COMPARISON.csv" beforeDir="false" afterPath="$PROJECT_DIR$/results/MODELS_PERFORMANCE_COMPARISON.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/visualizations/01_DATASET_OVERVIEW.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/visualizations/02_TARGET_DISTRIBUTION.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/visualizations/03_OUTLIERS_DETECTION_PART1.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/visualizations/03_OUTLIERS_DETECTION_PART2.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/visualizations/04_NUMERIC_DISTRIBUTIONS.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/visualizations/05_DESCRIPTIVE_STATISTICS.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/visualizations/06_FEATURE_IMPORTANCE_ALL.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/visualizations/06_FEATURE_IMPORTANCE_TOP15.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/visualizations/07_CORRELATION_MATRIX_FULL.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/visualizations/07_CORRELATION_STRONG_PAIRS.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/visualizations/08_BIVARIATE_RELATIONSHIPS.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/visualizations/09_PAIRPLOT_MAIN_VARIABLES.png" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/visualizations/10_MODELS_CONFUSION_MATRICES.png" beforeDir="false" afterPath="$PROJECT_DIR$/visualizations/10_MODELS_CONFUSION_MATRICES.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/visualizations/11_MODELS_PERFORMANCE_SUMMARY.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/visualizations/12_MODELS_ROC_CURVES.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/visualizations/11_MODELS_PERFORMANCE_SUMMARY.png" beforeDir="false" afterPath="$PROJECT_DIR$/visualizations/11_MODELS_PERFORMANCE_SUMMARY.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/visualizations/12_MODELS_ROC_CURVES.png" beforeDir="false" afterPath="$PROJECT_DIR$/visualizations/12_MODELS_ROC_CURVES.png" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -171,7 +160,15 @@
       <option name="project" value="LOCAL" />
       <updated>1764528907508</updated>
     </task>
-    <option name="localTasksCounter" value="10" />
+    <task id="LOCAL-00010" summary="version final">
+      <option name="closed" value="true" />
+      <created>1764589585334</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1764589585334</updated>
+    </task>
+    <option name="localTasksCounter" value="11" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
